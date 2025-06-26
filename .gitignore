@@ -1,0 +1,11 @@
+node_modules
+*.log
+npm-debug.log
+pids
+*.pid
+*.seed
+*.pid.lock
+.env
+.env.*
+videos
+*.tar
