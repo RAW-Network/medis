@@ -1,6 +1,7 @@
 services:
   medis:
-    build: .
+    image: ghcr.io/raw-network/medis:latest
+    container_name: medis
     ports:
       - 3000:3000
     volumes:
