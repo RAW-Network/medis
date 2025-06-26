@@ -1,0 +1,10 @@
+services:
+  medis:
+    build: .
+    ports:
+      - 3000:3000
+    volumes:
+      - ./videos:/usr/src/app/videos
+    environment:
+      - TZ=Asia/Makassar
+    restart: unless-stopped
