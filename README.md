@@ -15,7 +15,7 @@ Use only in private, trusted environments. Avoid deploying to production until t
 
 🔍 Preview
 
-![App Preview](https://i.imgur.com/qfAPW9w.png)
+![App Preview](https://i.imgur.com/MqtLjWB.png)
 
 ---
 
@@ -80,9 +80,8 @@ Customize with environment variables (if needed):
 
 | Variable         | Description                       | Default               |
 | ---------------- | --------------------------------- | --------------------- |
-| `PORT`           | Port the app runs on              | `3000`                |
-| `VIDEOS_DIR`     | Folder where videos are saved     | `/videos`             |
-| `VIDEOS_DB_PATH` | JSON file to store video metadata | `/videos/videos.json` |
+| `TZ`             | The timezone for the container    | `UTC`                 |
+
 
 ---
 
@@ -126,21 +125,21 @@ http://localhost:3000
 
 ## 📂 Project Structure
 
-```
+```plaintext
 medis/
-├── public/               # Frontend files (HTML, CSS, JS)
-│   ├── index.html
-│   ├── app.js
-│   └── style.css
-├── server.js             # Main Express + WebSocket backend
-├── Dockerfile            # Alpine-based Docker build
-├── docker-compose.yaml   # Optional service runner
-├── entrypoint.sh         # Entrypoint script (if used)
-├── package.json          # Node.js dependencies
-└── config/               # Video metadata storage (videos.json)
+├── public/                # Frontend assets
+│   ├── index.html         # Main HTML page
+│   ├── app.js             # Frontend JS logic
+│   └── style.css          # Styling for the UI
+├── videos/                # Downloaded videos and thumbnails
+│   └── videos.json        # Metadata store for downloads
+├── server.js              # Express + WebSocket backend
+├── Dockerfile             # Docker image definition
+├── docker-compose.yaml    # Docker Compose config
+├── entrypoint.sh          # Container startup script
+├── package.json           # Node.js project manifest
+└── package-lock.json      # Dependency lockfile
 ```
-
----
 
 ## 📄 License
 
