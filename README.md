@@ -15,7 +15,7 @@ Use only in private, trusted environments. Avoid deploying to production until t
 
 🔍 Preview
 
-![App Preview](https://i.imgur.com/MqtLjWB.png)
+![App Preview](https://i.imgur.com/iRKFyOR.jpeg)
 
 ---
 
