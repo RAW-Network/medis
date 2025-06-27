@@ -17,6 +17,28 @@ const wss = new WebSocketServer({ server });
 
 let activeDownloads = 0;
 let lastKnownSpeed = '0 B/s';
+const MAX_ACTIVE_DOWNLOADS = 5;
+
+const isValidUrl = (url) => {
+  try {
+    const parsedUrl = new URL(url);
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      return false;
+    }
+    const { hostname } = parsedUrl;
+    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.') || hostname.startsWith('10.') || hostname.startsWith('172.')) {
+        return false;
+    }
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+const isUuid = (uuid) => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+};
 
 function broadcast(data) {
   wss.clients.forEach(client => {
@@ -66,7 +88,16 @@ app.get('/api/videos', async (req, res) => {
 app.post('/api/download', async (req, res) => {
   const { url } = req.body;
   console.log(`[API] POST /api/download - Request received for URL: ${url}`);
-  if (!url) return res.status(400).json({ message: 'URL is required' });
+
+  if (!url || !isValidUrl(url)) {
+    return res.status(400).json({ message: 'URL is invalid or not allowed' });
+  }
+
+  if (activeDownloads >= MAX_ACTIVE_DOWNLOADS) {
+    console.warn(`[SECURITY] Download limit reached. Denying new download request.`);
+    return res.status(429).json({ message: 'Too many active downloads. Please wait.' });
+  }
+
   res.status(202).json({ message: 'Download initiated' });
 
   const videoId = uuidv4();
@@ -79,11 +110,14 @@ app.post('/api/download', async (req, res) => {
     const metadata = await ytdlp.getVideoInfo(url);
 
     console.log('[Backend] Step 2/3: Metadata received. Starting video file download...');
-    const thumbnailFilename = `${videoId}-thumb.jpg`;
-    const thumbnailPath = path.join(videosPath, thumbnailFilename);
+    
+    let thumbnailFilename = '';
+    let finalThumbnailUrl = '';
 
     if (metadata.thumbnail) {
       try {
+        thumbnailFilename = `${videoId}-thumb.jpg`;
+        const thumbnailPath = path.join(videosPath, thumbnailFilename);
         const response = await axios.get(metadata.thumbnail, { responseType: 'stream' });
         const writer = createWriteStream(thumbnailPath);
         await new Promise((resolve, reject) => {
@@ -91,6 +125,7 @@ app.post('/api/download', async (req, res) => {
           writer.on('finish', resolve);
           writer.on('error', reject);
         });
+        finalThumbnailUrl = `/videos/${thumbnailFilename}`;
       } catch (err) {
         console.error('[Backend] Failed to download thumbnail:', err.message);
       }
@@ -101,16 +136,18 @@ app.post('/api/download', async (req, res) => {
       title: metadata.title || 'Untitled Video',
       originalUrl: url,
       filename: `${videoId}.mp4`,
-      thumbnailUrl: `/videos/${thumbnailFilename}`,
+      thumbnailUrl: finalThumbnailUrl,
       createdAt: new Date().toISOString()
     };
 
-    const downloader = ytdlp.exec([
-      url,
-      '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-      '-o', path.join(videosPath, newVideoData.filename),
-      '--progress'
-    ]);
+    const args = [
+        url,
+        '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+        '-o', path.join(videosPath, newVideoData.filename),
+        '--progress'
+    ];
+
+    const downloader = ytdlp.exec(args);
 
     downloader.on('progress', (progress) => {
       lastKnownSpeed = progress.speed || '0 B/s';
@@ -152,13 +189,23 @@ app.post('/api/download', async (req, res) => {
 
 app.delete('/api/videos/:id', async (req, res) => {
   const { id } = req.params;
+
+  if (!isUuid(id)) {
+    return res.status(400).json({ message: 'Invalid ID format' });
+  }
+
   console.log(`[API] DELETE /api/videos/${id} - Deleting video.`);
   let videos = await readDB();
   const videoToDelete = videos.find(v => v.id === id);
   if (!videoToDelete) return res.status(404).json({ message: 'Video not found' });
+  
+  const videoFilePath = path.resolve(videosPath, videoToDelete.filename);
+  const thumbnailFilePath = path.resolve(videosPath, `${id}-thumb.jpg`);
 
-  const videoFilePath = path.join(videosPath, videoToDelete.filename);
-  const thumbnailFilePath = path.join(videosPath, `${id}-thumb.jpg`);
+  if (!videoFilePath.startsWith(videosPath) || !thumbnailFilePath.startsWith(videosPath)) {
+    console.error(`[SECURITY] Attempted path traversal for video ID: ${id}`);
+    return res.status(400).json({ message: 'Invalid file path' });
+  }
 
   try {
     await fs.access(videoFilePath);
@@ -178,6 +225,11 @@ app.delete('/api/videos/:id', async (req, res) => {
 
 app.get('/share/:id', async (req, res) => {
   const { id } = req.params;
+
+  if (!isUuid(id)) {
+    return res.status(400).send('Invalid ID format');
+  }
+
   const videos = await readDB();
   const video = videos.find(v => v.id === id);
   if (!video) return res.status(404).send('Video not found');
