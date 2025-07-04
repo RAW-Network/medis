@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="MEDIS">
+  <meta property="og:description" content="Media Embedding Delivery for Interactive Sharing.">
+  <meta property="og:type" content="website">
+  <title>MEDIS | Media Embedding</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="status-bar">
+    <div class="status-item" id="downloading-status">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M3,15V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V15H19V19H5V15H3M12,14L17,9H14V3H10V9H7L12,14Z"></path></svg>
+      <span id="downloading-count">0</span>
+      <span>downloading</span>
+    </div>
+    <div class="status-item" id="completed-status">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"></path></svg>
+      <span id="completed-count">0</span>
+      <span>completed</span>
+    </div>
+    <div class="progress-bar-container" id="progress-bar-container" style="display: none;">
+      <div class="progress-bar-inner" id="progress-bar-inner"></div>
+      <div id="progress-text"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <header>
+      <div class="logo">
+        <h1>MEDIS</h1>
+        <span>Media Embedding Delivery for Interactive Sharing</span>
+      </div>
+      <p>Fetch, convert, and share videos from any link with a simple, fast, and platform-agnostic workflow.</p>
+    </header>
+
+    <main>
+      <section class="form-container">
+        <div class="input-wrapper">
+          <input type="text" id="video-url" placeholder="Paste a video link (YouTube, Instagram, TikTok, etc.)" />
+          <button id="download-btn" aria-label="Download Video">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+        </div>
+        <div id="loading-indicator" class="hidden">
+          <div class="spinner"></div>
+          <span>Downloading, please wait...</span>
+        </div>
+      </section>
+
+      <section class="video-list-container">
+        <h2>Downloaded Videos</h2>
+        <div id="video-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="app.js"></script>
+
+  <footer>
+    <div class="footer-item">
+      <span class="badge-label">YT-DLP</span>
+      <span class="badge-value" id="ytdlp-version">loading...</span>
+    </div>
+    <div class="footer-item">
+      <span class="badge-label">MEDIS</span>
+      <span class="badge-value" id="medis-version">loading...</span>
+    </div>
+    <a href="https://github.com/raw-network/medis" target="_blank" rel="noopener noreferrer" class="footer-item github-link">
+      <svg class="github-icon" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+      <span>Github</span>
+    </a>
+  </footer>
+
+</body>
+</html>

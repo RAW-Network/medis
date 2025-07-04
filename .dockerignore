@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+*.log
+.git
+.gitignore
+.dockerignore
+README.md
+LICENSE
+videos
+cookies
