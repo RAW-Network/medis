@@ -8,6 +8,7 @@ const path = require('path');
 const YTDlpWrap = require('yt-dlp-wrap').default;
 const { v4: uuidv4 } = require('uuid');
 const axios = require('axios');
+const db = require('./db.js');
 
 const app = express();
 const port = 3000;
@@ -98,34 +99,22 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use('/videos', express.static(path.join(__dirname, 'videos')));
 
-const dbPath = path.join(__dirname, 'videos', 'videos.json');
 const videosPath = path.join(__dirname, 'videos');
 const cookiesDirPath = path.join(__dirname, 'cookies');
 
 if (!existsSync(videosPath)) mkdirSync(videosPath, { recursive: true });
 if (!existsSync(cookiesDirPath)) mkdirSync(cookiesDirPath, { recursive: true });
-if (!existsSync(dbPath)) {
-  require('fs').writeFileSync(dbPath, JSON.stringify([]));
-}
 
-const readDB = async () => {
+app.get('/api/videos', (req, res) => {
   try {
-    await fs.access(dbPath);
-  } catch {
-    await fs.writeFile(dbPath, JSON.stringify([]));
+    const stmt = db.prepare('SELECT * FROM videos ORDER BY createdAt DESC');
+    const videos = stmt.all();
+    console.log(`[API] GET /api/videos - Returning ${videos.length} videos`);
+    res.json(videos);
+  } catch (error) {
+    console.error('[SQLite Error] Failed to fetch videos:', error);
+    res.status(500).json({ message: 'Failed to retrieve video data' });
   }
-  const data = await fs.readFile(dbPath);
-  return JSON.parse(data);
-};
-
-const writeDB = async (data) => {
-  await fs.writeFile(dbPath, JSON.stringify(data, null, 2));
-};
-
-app.get('/api/videos', async (req, res) => {
-  const videos = await readDB();
-  console.log(`[API] GET /api/videos - Returning ${videos.length} videos.`);
-  res.json(videos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
 });
 
 app.get('/api/version', async (req, res) => {
@@ -190,26 +179,29 @@ async function startDownload(downloadJob) {
 
         try {
             await fs.access(cookiesFilePath);
-            console.log('[Backend] cookies.txt found. Using for download requests.');
             commonArgs.push('--cookies', cookiesFilePath);
         } catch {
-            console.log('[Backend] cookies.txt not found. Proceeding without cookies.');
         }
 
         const infoArgs = [...commonArgs, '--dump-json', '--', url];
-        console.log(`[Backend] Executing for metadata: yt-dlp ${infoArgs.join(' ')}`);
         const stdout = await ytdlp.execPromise(infoArgs);
         metadata = JSON.parse(stdout);
         
-        let thumbnailFilename = '';
         let finalThumbnailUrl = '';
 
         broadcast({ type: 'progress', stage: 'FETCHING_THUMBNAIL', message: 'Fetching thumbnail...', percent: 0, videoId });
+        
         if (metadata.thumbnail) {
             try {
-                thumbnailFilename = `${videoId}-thumb.jpg`;
+                const thumbnailFilename = `${videoId}-thumb.jpg`;
                 const thumbnailPath = path.join(videosPath, thumbnailFilename);
-                const response = await axios.get(metadata.thumbnail, { responseType: 'stream' });
+                
+                const response = await axios.get(metadata.thumbnail, { 
+                    responseType: 'stream',
+                    maxContentLength: 5 * 1024 * 1024,
+                    maxBodyLength: 5 * 1024 * 1024 
+                });
+
                 const writer = createWriteStream(thumbnailPath);
                 await new Promise((resolve, reject) => {
                     response.data.pipe(writer);
@@ -218,7 +210,7 @@ async function startDownload(downloadJob) {
                 });
                 finalThumbnailUrl = `/videos/${thumbnailFilename}`;
             } catch (err) {
-                console.error('[Backend] Failed to download thumbnail:', err.message);
+                console.error('[AXIOS-ERROR] Failed to download thumbnail:', err.message);
             }
         }
 
@@ -257,11 +249,15 @@ async function startDownload(downloadJob) {
         downloader.on('close', async () => {
             broadcast({ type: 'progress', stage: 'PROCESSING', message: 'Processing video...', percent: 100, videoId });
             
-            const videos = await readDB();
-            videos.push(newVideoData);
-            await writeDB(videos);
-            broadcast({ type: 'downloadComplete', video: newVideoData });
-            finishDownload();
+            try {
+                 const stmt = db.prepare('INSERT INTO videos (id, title, originalUrl, filename, thumbnailUrl, createdAt, width, height) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+                 stmt.run(newVideoData.id, newVideoData.title, newVideoData.originalUrl, newVideoData.filename, newVideoData.thumbnailUrl, newVideoData.createdAt, newVideoData.width, newVideoData.height);
+                 broadcast({ type: 'downloadComplete', video: newVideoData });
+            } catch (dbError) {
+                console.error("[SQLite Error] Failed to save metadata:", dbError);
+            } finally {
+                finishDownload();
+            }
         });
 
         downloader.on('error', (err) => {
@@ -299,59 +295,67 @@ app.delete('/api/videos/:id', async (req, res) => {
     if (!isUuid(id)) {
         return res.status(400).json({ message: 'Invalid ID format' });
     }
+    
+    const deleteTransaction = db.transaction((videoId) => {
+        const getVideoStmt = db.prepare('SELECT filename, thumbnailUrl FROM videos WHERE id = ?');
+        const videoToDelete = getVideoStmt.get(videoId);
 
-    let videos = await readDB();
-    const videoToDelete = videos.find(v => v.id === id);
-    if (!videoToDelete) {
-        return res.status(404).json({ message: 'Video not found' });
-    }
-  
-    const videoFilePath = path.join(videosPath, videoToDelete.filename);
-    let thumbnailFilePath = null;
-    if (videoToDelete.thumbnailUrl) {
-        const thumbnailFilename = path.basename(videoToDelete.thumbnailUrl);
-        thumbnailFilePath = path.join(videosPath, thumbnailFilename);
-    }
+        if (!videoToDelete) {
+            return { success: false, status: 404, message: 'Video not found in DB' };
+        }
 
-    if (!videoFilePath.startsWith(videosPath)) {
-        console.error(`[SECURITY] Attempted path traversal for video ID: ${id}`);
-        return res.status(400).json({ message: 'Invalid file path' });
-    }
+        const deleteStmt = db.prepare('DELETE FROM videos WHERE id = ?');
+        const info = deleteStmt.run(videoId);
 
-    if (thumbnailFilePath && !thumbnailFilePath.startsWith(videosPath)) {
-        console.error(`[SECURITY] Attempted path traversal for thumbnail file. ID: ${id}`);
-        return res.status(400).json({ message: 'Invalid thumbnail path' });
-    }
+        if (info.changes === 0) {
+            throw new Error('Deletion from database failed unexpectedly.');
+        }
+
+        try {
+            const videoFilePath = path.join(videosPath, videoToDelete.filename);
+            if (existsSync(videoFilePath)) {
+                fs.unlink(videoFilePath);
+            }
+
+            if (videoToDelete.thumbnailUrl) {
+                const thumbnailFilePath = path.join(videosPath, path.basename(videoToDelete.thumbnailUrl));
+                if (existsSync(thumbnailFilePath)) {
+                    fs.unlink(thumbnailFilePath);
+                }
+            }
+        } catch (fileErr) {
+            console.error(`[DELETE-ERROR] Failed to delete files for ${videoId}, rolling back DB change.`, fileErr);
+            throw new Error('File deletion failed, rolling back DB change.');
+        }
+        
+        return { success: true, status: 200, message: 'Video deleted successfully' };
+    });
 
     try {
-        await fs.unlink(videoFilePath);
-    } catch (err) {
-        if (err.code !== 'ENOENT') console.error(`[Delete] Error deleting video file:`, err);
+        const result = deleteTransaction(id);
+        res.status(result.status).json({ message: result.message });
+    } catch (error) {
+        console.error(`[SQLite Error] Transaction failed for deleting video ${id}:`, error);
+        res.status(500).json({ message: 'Failed to delete video due to a server error' });
     }
-
-    if (thumbnailFilePath) {
-        try {
-            await fs.unlink(thumbnailFilePath);
-        } catch (err) {
-            if (err.code !== 'ENOENT') console.error(`[Delete] Error deleting thumbnail file:`, err);
-        }
-    }
-
-    const updatedVideos = videos.filter(v => v.id !== id);
-    await writeDB(updatedVideos);
-  
-    res.status(200).json({ message: 'Video deleted successfully' });
 });
 
-app.get('/share/:id', async (req, res) => {
+app.get('/share/:id', (req, res) => {
     const { id } = req.params;
 
     if (!isUuid(id)) {
         return res.status(400).send('Invalid ID format');
     }
 
-    const videos = await readDB();
-    const video = videos.find(v => v.id === id);
+    let video;
+    try {
+        const stmt = db.prepare('SELECT * FROM videos WHERE id = ?');
+        video = stmt.get(id);
+    } catch (error) {
+        console.error(`[SQLite Error] Failed to fetch video for sharing ${id}:`, error);
+        return res.status(500).send('Error retrieving video data');
+    }
+    
     if (!video) return res.status(404).send('Video not found');
 
     const protocol = req.headers['x-forwarded-proto'] || req.protocol;
@@ -434,39 +438,42 @@ async function cleanupIncompleteFiles(baseFilename) {
 
 async function cleanupOrphanedFilesOnStartup() {
     try {
-        const dbVideos = await readDB();
-        const validFiles = new Set();
+        const getDbFilesStmt = db.prepare('SELECT filename, thumbnailUrl FROM videos');
+        const dbVideos = getDbFilesStmt.all();
+
+        const validFiles = new Set(['medis.db', 'medis.db-shm', 'medis.db-wal']);
         dbVideos.forEach(video => {
-            validFiles.add(video.filename);
-            if (video.thumbnailUrl) {
-                validFiles.add(path.basename(video.thumbnailUrl));
-            }
+            if (video.filename) validFiles.add(video.filename);
+            if (video.thumbnailUrl) validFiles.add(path.basename(video.thumbnailUrl));
         });
 
         const diskFiles = await fs.readdir(videosPath);
         let deletedCount = 0;
 
         for (const file of diskFiles) {
-            if (!validFiles.has(file) && file !== 'videos.json') {
-                if(file.endsWith('.part')) {
-                    await fs.unlink(path.join(videosPath, file));
-                    deletedCount++;
-                } else {
-                    await fs.unlink(path.join(videosPath, file));
-                    deletedCount++;
-                }
+            if (!validFiles.has(file)) {
+                console.log(`[Startup Cleanup] Found orphaned file: ${file}. Deleting...`);
+                await fs.unlink(path.join(videosPath, file));
+                deletedCount++;
             }
         }
+        if (deletedCount > 0) {
+            console.log(`[Startup Cleanup] Finished. Removed ${deletedCount} orphaned files.`);
+        } else {
+            console.log('[Startup Cleanup] No orphaned files found. System is clean.');
+        }
     } catch (err) {
-        console.error('[Startup Cleanup] Error during cleanup:', err);
+        console.error('[Startup Cleanup] An error occurred during cleanup:', err);
     }
 }
 
 (async () => {
-    console.log('[Startup] Cleaning up orphaned files and resetting active download counter');
-    console.log(`[Config] Maximum total jobs limit set to: ${MAX_QUEUE_LIMIT}`);
+    console.log('[Startup] Resetting active download counter');
     activeDownloads = 0;
+    
     await cleanupOrphanedFilesOnStartup();
+
+    console.log(`[Config] Maximum queue limit set to: ${MAX_QUEUE_LIMIT}`);
     server.listen(port, () => {
       console.log(`MEDIS app running at http://localhost:${port}`);
     });

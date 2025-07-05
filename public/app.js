@@ -10,10 +10,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressBarInner = document.getElementById('progress-bar-inner');
     const progressText = document.getElementById('progress-text');
     const toastContainer = document.getElementById('toast-container');
+    const confirmModal = document.getElementById('confirm-modal');
+    const modalText = document.getElementById('modal-text');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    const modalConfirmBtn = document.getElementById('modal-confirm-btn');
 
     const ICONS = {
-        copy: `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>`,
-        trash: `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`
+        copy: `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>`,
+        trash: `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`,
+        copied: `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`
     };
 
     function showToast(message, type = 'info') {
@@ -52,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
             switch (data.type) {
                 case 'status':
                     downloadingCountEl.textContent = data.activeDownloads + (data.queueSize || 0);
-                    
                     if (data.activeDownloads === 0 && (data.queueSize || 0) === 0) {
                         setTimeout(() => {
                             if (parseInt(downloadingCountEl.textContent) === 0) {
@@ -82,6 +86,44 @@ document.addEventListener('DOMContentLoaded', () => {
                     break;
             }
         };
+    }
+
+    function showConfirmModal(title) {
+        return new Promise(resolve => {
+            modalText.innerHTML = `Are you sure you want to delete "<strong>${title}</strong>"?`;
+            confirmModal.style.display = 'flex';
+            setTimeout(() => confirmModal.classList.add('visible'), 10);
+
+            const handleConfirm = () => {
+                cleanup();
+                resolve(true);
+            };
+
+            const handleCancel = () => {
+                cleanup();
+                resolve(false);
+            };
+            
+            const handleOverlayClick = (e) => {
+                if (e.target === confirmModal) {
+                    handleCancel();
+                }
+            };
+
+            const cleanup = () => {
+                confirmModal.classList.remove('visible');
+                setTimeout(() => {
+                    confirmModal.style.display = 'none';
+                    modalConfirmBtn.removeEventListener('click', handleConfirm);
+                    modalCancelBtn.removeEventListener('click', handleCancel);
+                    confirmModal.removeEventListener('click', handleOverlayClick);
+                }, 200);
+            };
+
+            modalConfirmBtn.addEventListener('click', handleConfirm);
+            modalCancelBtn.addEventListener('click', handleCancel);
+            confirmModal.addEventListener('click', handleOverlayClick);
+        });
     }
 
     async function fetchAndRenderVideos() {
@@ -132,42 +174,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 actions.className = 'card-actions';
 
                 const copyBtn = document.createElement('button');
-                copyBtn.className = 'action-btn';
+                copyBtn.className = 'action-btn copy-btn';
                 copyBtn.innerHTML = ICONS.copy + ' <span>Copy Link</span>';
-                copyBtn.title = 'Copy Shareable Link';
+                copyBtn.title = 'Copy Link';
                 copyBtn.addEventListener('click', () => {
+                    if (copyBtn.disabled) return;
+                    copyBtn.disabled = true;
+                    copyBtn.innerHTML = ICONS.copied + ' <span>Copied!</span>';
                     const shareLink = `${window.location.origin}/share/${video.id}`;
-                    navigator.clipboard.writeText(shareLink).then(() => showToast('Shareable link copied to clipboard!', 'success'));
+                    navigator.clipboard.writeText(shareLink).then(() => showToast('Link copied successfully!', 'success'));
+                    setTimeout(() => {
+                        copyBtn.innerHTML = ICONS.copy + ' <span>Copy Link</span>';
+                        copyBtn.disabled = false;
+                    }, 2000);
                 });
 
                 const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'action-btn';
+                deleteBtn.className = 'action-btn delete-btn';
                 deleteBtn.innerHTML = ICONS.trash + ' <span>Delete</span>';
                 deleteBtn.title = 'Delete Video';
 
-                deleteBtn.addEventListener('click', async (e) => {
-                    if (confirm(`Are you sure you want to delete "${video.title}"?`)) {
-                        const cardToDelete = e.currentTarget.closest('.video-card');
-
-                        cardToDelete.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-                        cardToDelete.style.opacity = '0';
-                        cardToDelete.style.transform = 'scale(0.95)';
-
-                        setTimeout(async () => {
+                deleteBtn.addEventListener('click', function (e) {
+                    const thisCard = card;
+                    const thisDeleteBtn = deleteBtn;
+                    (async () => {
+                        const confirmed = await showConfirmModal(video.title);
+                        if (confirmed) {
+                            const buttons = thisCard.querySelectorAll('.action-btn');
+                            buttons.forEach(btn => btn.disabled = true);
+                            thisDeleteBtn.innerHTML = `<div class=\"spinner-overlay\"><div class=\"spinner\"></div></div>` + ICONS.trash + ' <span>Deleting...</span>';
                             try {
                                 const response = await fetch(`${API_URL}/videos/${video.id}`, { method: 'DELETE' });
                                 if (!response.ok) {
-                                    throw new Error('Failed to delete on server.');
+                                    const result = await response.json();
+                                    throw new Error(result.message || 'Failed to delete on server');
                                 }
-                                cardToDelete.remove();
-                                completedCountEl.textContent = parseInt(completedCountEl.textContent) - 1;
+                                showToast(`Successfully deleted \"${video.title}\"`, 'success');
+                                fetchAndRenderVideos();
                             } catch (error) {
-                                showToast(`Error deleting "${video.title}". Restoring list.`, 'error');
-                                cardToDelete.style.opacity = '1';
-                                cardToDelete.style.transform = 'scale(1)';
+                                showToast(`Failed to delete: ${error.message}`, 'error');
+                                buttons.forEach(btn => btn.disabled = false);
+                                thisDeleteBtn.innerHTML = ICONS.trash + ' <span>Delete</span>';
                             }
-                        }, 300);
-                    }
+                        }
+                    })();
                 });
 
                 actions.append(copyBtn, deleteBtn);
@@ -186,26 +236,18 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('Please enter a video URL.', 'error');
             return;
         }
-
         downloadBtn.disabled = true;
         loadingIndicator.classList.remove('hidden');
-
         try {
             const response = await fetch(`${API_URL}/download`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url })
             });
-
             const result = await response.json();
-            
-            if (!response.ok) {
-                throw new Error(result.message || 'An unknown error occurred during the request.');
-            }
-            
+            if (!response.ok) throw new Error(result.message || 'An unknown error occurred during the request');
             showToast(result.message, 'info');
             videoUrlInput.value = '';
-
         } catch (error) {
             showToast(error.message, 'error');
         } finally {
