@@ -7,9 +7,9 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./videos:/videos
-      - ./cookies:/cookies
+      - ./storage/videos:/videos
+      - ./storage/cookies:/cookies
     environment:
-      - TZ=Asia/Makassar
-      - MAX_QUEUE_LIMIT=5
+      - TZ=${TZ}
+      - MAX_QUEUE_LIMIT=${MAX_QUEUE_LIMIT}
     restart: unless-stopped

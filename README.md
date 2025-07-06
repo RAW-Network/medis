@@ -51,7 +51,7 @@ services:
       - ./videos:/videos
       - ./cookies:/cookies
     environment:
-      - TZ=Asia/Makassar
+      - TZ=UTC
       - MAX_QUEUE_LIMIT=5
     restart: unless-stopped
 ```
@@ -130,22 +130,47 @@ http://localhost:3000
 
 ```plaintext
 medis/
-├── public/                  # Frontend assets
-│   ├── index.html           # Main HTML page
-│   ├── app.js               # Frontend JS logic
-│   └── style.css            # Styling for the UI
-├── videos/                  # Downloaded videos and thumbnails
-│   └── videos.json          # Metadata store for downloads
-├── cookies/                 # Stores cookies for authenticated download sessions
-│   └── cookies.txt          # Cookies for authenticated download sessions
-├── server.js                # Express + WebSocket backend server
-├── Dockerfile               # Docker image definition
-├── docker-compose.yaml      # Docker Compose config for container setup
-├── entrypoint.sh            # Startup script for the container
-├── package.json             # Node.js project manifest
-├── package-lock.json        # Exact dependency tree lock
-├── .dockerignore            # Ignore files/folders from Docker build context
-├── .gitignore               # Ignore files/folders from Git version control
+├── src/
+│   ├── api/
+│   │   ├── routes/
+│   │   │   ├── video.routes.js
+│   │   │   └── misc.routes.js
+│   │   ├── controllers/
+│   │   │   ├── video.controller.js
+│   │   │   └── misc.controller.js
+│   │   └── middlewares/
+│   │       ├── errorHandler.js
+│   │       └── validator.js
+│   ├── config/
+│   │   ├── index.js
+│   │   └── database.js
+│   ├── services/
+│   │   ├── download.service.js
+│   │   ├── video.service.js
+│   │   └── websocket.service.js
+│   ├── utils/
+│   │   ├── CustomError.js
+│   │   └── security.js
+│   ├── app.js
+│   └── index.js
+│
+├── public/
+│   ├── index.html
+│   ├── app.js
+│   └── style.css
+│
+├── storage/
+│   ├── videos/
+│   └── cookies/
+│
+├── .dockerignore
+├── .gitignore
+├── .env.example
+├── docker-compose.yml
+├── Dockerfile
+├── entrypoint.sh
+├── package.json
+└── README.md
 ```
 
 ## 📄 License

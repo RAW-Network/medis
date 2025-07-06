@@ -1,12 +1,19 @@
 #!/bin/sh
 
-# Link external volumes to the application's working directory.
-ln -sfn /videos /app/videos
-ln -sfn /cookies /app/cookies
+# Define the main application directory
+APP_DIR="/home/app/medis"
 
-# Ensure the non-root 'node' user has write permissions to the volumes.
-chown -R node:node /videos
-chown -R node:node /cookies
+# Ensure persistent storage directories exist for videos and cookies
+mkdir -p /videos
+mkdir -p /cookies
 
-# Switch to the 'node' user and execute the main container command (CMD).
-exec su-exec node "$@"
+# Create symbolic links from app storage to persistent Docker volumes
+ln -sfn /videos ${APP_DIR}/storage/videos
+ln -sfn /cookies ${APP_DIR}/storage/cookies
+
+# Set ownership for persistent storage directories
+chown -R medis:medis /videos
+chown -R medis:medis /cookies
+
+# Start the application using dumb-init
+exec /usr/bin/dumb-init -- su-exec app "$@"

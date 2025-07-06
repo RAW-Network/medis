@@ -69,9 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (progressBarContainer.style.display === 'none') {
                         progressBarContainer.style.display = 'flex';
                     }
-                    if (data.percent !== undefined && data.message) {
+                    progressText.textContent = data.message;
+                    if (data.percent !== undefined) {
                         progressBarInner.style.width = `${data.percent}%`;
-                        progressText.textContent = data.message;
                     }
                     break;
                 case 'downloadComplete':
@@ -82,6 +82,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     showToast(data.message, 'error');
                     if (parseInt(downloadingCountEl.textContent, 10) === 0) {
                         progressBarContainer.style.display = 'none';
+                    }
+                    break;
+                case 'videoDeleted':
+                    const cardToRemove = document.querySelector(`.video-card[data-video-id="${data.videoId}"]`);
+                    if (cardToRemove) {
+                        cardToRemove.remove();
+                        completedCountEl.textContent = parseInt(completedCountEl.textContent, 10) - 1;
                     }
                     break;
             }
@@ -103,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 cleanup();
                 resolve(false);
             };
-            
+
             const handleOverlayClick = (e) => {
                 if (e.target === confirmModal) {
                     handleCancel();
@@ -135,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
             completedCountEl.textContent = videos.length;
 
             if (videos.length === 0) {
-                videoList.innerHTML = '<p style="text-align: center; color: var(--text-secondary); grid-column: 1 / -1;">Your library is empty. Start by downloading a video.</p>';
+                videoList.innerHTML = '<p style="text-align: center; color: var(--text-secondary); grid-column: 1 / -1;">Your library is empty. Start by downloading a video</p>';
                 return;
             }
 
@@ -179,45 +186,65 @@ document.addEventListener('DOMContentLoaded', () => {
                 copyBtn.title = 'Copy Link';
                 copyBtn.addEventListener('click', () => {
                     if (copyBtn.disabled) return;
-                    copyBtn.disabled = true;
-                    copyBtn.innerHTML = ICONS.copied + ' <span>Copied!</span>';
                     const shareLink = `${window.location.origin}/share/${video.id}`;
-                    navigator.clipboard.writeText(shareLink).then(() => showToast('Link copied successfully!', 'success'));
-                    setTimeout(() => {
-                        copyBtn.innerHTML = ICONS.copy + ' <span>Copy Link</span>';
-                        copyBtn.disabled = false;
-                    }, 2000);
+                    const fallbackCopyTextToClipboard = (text) => {
+                        const textArea = document.createElement('textarea');
+                        textArea.value = text;
+                        textArea.style.position = 'absolute';
+                        textArea.style.left = '-9999px';
+                        
+                        document.body.prepend(textArea);
+                        textArea.select();
+                        
+                        let successful = false;
+                        try {
+                            successful = document.execCommand('copy');
+                        } catch (err) {
+                            console.error('Fallback: Gagal menyalin', err);
+                        }
+                        
+                        textArea.remove();
+                        return successful;
+                    };
+
+                    const copied = fallbackCopyTextToClipboard(shareLink);
+
+                    if (copied) {
+                        copyBtn.disabled = true;
+                        copyBtn.innerHTML = ICONS.copied + ' <span>Copied!</span>';
+                        showToast('Link copied successfully!', 'success');
+                        setTimeout(() => {
+                            copyBtn.innerHTML = ICONS.copy + ' <span>Copy Link</span>';
+                            copyBtn.disabled = false;
+                        }, 2000);
+                    } else {
+                        showToast('Failed to copy link.', 'error');
+                    }
                 });
 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'action-btn delete-btn';
                 deleteBtn.innerHTML = ICONS.trash + ' <span>Delete</span>';
                 deleteBtn.title = 'Delete Video';
-
-                deleteBtn.addEventListener('click', function (e) {
-                    const thisCard = card;
-                    const thisDeleteBtn = deleteBtn;
-                    (async () => {
-                        const confirmed = await showConfirmModal(video.title);
-                        if (confirmed) {
-                            const buttons = thisCard.querySelectorAll('.action-btn');
-                            buttons.forEach(btn => btn.disabled = true);
-                            thisDeleteBtn.innerHTML = `<div class=\"spinner-overlay\"><div class=\"spinner\"></div></div>` + ICONS.trash + ' <span>Deleting...</span>';
-                            try {
-                                const response = await fetch(`${API_URL}/videos/${video.id}`, { method: 'DELETE' });
-                                if (!response.ok) {
-                                    const result = await response.json();
-                                    throw new Error(result.message || 'Failed to delete on server');
-                                }
-                                showToast(`Successfully deleted \"${video.title}\"`, 'success');
-                                fetchAndRenderVideos();
-                            } catch (error) {
-                                showToast(`Failed to delete: ${error.message}`, 'error');
-                                buttons.forEach(btn => btn.disabled = false);
-                                thisDeleteBtn.innerHTML = ICONS.trash + ' <span>Delete</span>';
+                deleteBtn.addEventListener('click', async function () {
+                    const confirmed = await showConfirmModal(video.title);
+                    if (confirmed) {
+                        const buttons = card.querySelectorAll('.action-btn');
+                        buttons.forEach(btn => btn.disabled = true);
+                        deleteBtn.innerHTML = `<div class="spinner-overlay"><div class="spinner"></div></div>` + ICONS.trash + ' <span>Deleting...</span>';
+                        try {
+                            const response = await fetch(`${API_URL}/videos/${video.id}`, { method: 'DELETE' });
+                            if (!response.ok) {
+                                const result = await response.json();
+                                throw new Error(result.message || 'Failed to delete on server');
                             }
+                            showToast(`Successfully deleted "${video.title}"`, 'success');
+                        } catch (error) {
+                            showToast(`Failed to delete: ${error.message}`, 'error');
+                            buttons.forEach(btn => btn.disabled = false);
+                            deleteBtn.innerHTML = ICONS.trash + ' <span>Delete</span>';
                         }
-                    })();
+                    }
                 });
 
                 actions.append(copyBtn, deleteBtn);

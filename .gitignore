@@ -6,7 +6,4 @@ pids
 *.seed
 *.pid.lock
 .env
-.env.*
-videos
-cookies
-*.tar
+storage

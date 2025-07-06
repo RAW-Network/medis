@@ -1,13 +1,12 @@
-const path = require('path');
-const fs = require('fs');
 const Database = require('better-sqlite3');
+const fs = require('fs');
+const config = require('./index');
 
-const dbPath = path.join(__dirname, 'videos');
-if (!fs.existsSync(dbPath)) {
-    fs.mkdirSync(dbPath, { recursive: true });
+if (!fs.existsSync(config.videosPath)) {
+    fs.mkdirSync(config.videosPath, { recursive: true });
 }
 
-const db = new Database(path.join(dbPath, 'medis.db'));
+const db = new Database(config.dbPath);
 
 const createTableQuery = `
   CREATE TABLE IF NOT EXISTS videos (
@@ -25,7 +24,6 @@ const createTableQuery = `
 `;
 
 db.exec(createTableQuery);
-
 console.log('[Database] SQLite Ready!');
 
 module.exports = db;
