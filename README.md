@@ -4,18 +4,9 @@ A self-hosted media fetcher and sharer that lets you download and embed videos f
 
 ---
 
-# ⚠️ Security Notice
-
-🚧 Work in Progress — This project is still in active development and not fully tested yet.
-
-No formal security review has been conducted. Security-sensitive components such as user input handling, file storage, and endpoints may be vulnerable or improperly validated.
-Use only in private, trusted environments. Avoid deploying to production until the project is considered stable and security-tested.
-
----
-
 🔍 Preview
 
-<img src="https://files.catbox.moe/ti1taz.gif" alt="App Preview" width="700">
+<img src="https://files.catbox.moe/y9k2r0.gif" alt="App Preview" width="600">
 
 ---
 
@@ -34,7 +25,6 @@ Use only in private, trusted environments. Avoid deploying to production until t
 
 ### 🔧 Prerequisites
 
-* Git
 * Docker & Docker Compose (recommended)
 * Node.js (only for local development, optional)
 
@@ -80,15 +70,41 @@ docker compose down
 
 Customize with environment variables (if needed):
 
-| Variable         | Description                       | Default               |
-| ---------------- | --------------------------------- | --------------------- |
-| `TZ`             | The timezone for the container    | `UTC`                 |
-| `MAX_QUEUE_LIMIT`| Maximum total jobs limit          | `5`                   |
-
+| Variable          | Description                    | Default |
+| ----------------- | ------------------------------ | ------- |
+| `TZ`              | The timezone for the container | `UTC`   |
+| `MAX_QUEUE_LIMIT` | Maximum total jobs limit       | `5`     |
 
 ---
 
-## 💻 Option 2: Run Locally with Node.js
+## 🍪 Using Cookies (Optional)
+
+To download videos that require authentication (e.g., private or regional content)
+
+simply place a `cookies.txt` file inside the `cookies` directory:
+
+```bash
+cookies/
+  └── cookies.txt
+```
+
+### How to Get Your Cookies
+
+#### The cookies.txt file must be in Netscape HTTP Cookie File format
+
+Use the [Get cookies.txt](https://chrome.google.com/webstore/detail/get-cookiestxt/lopibhbgjfbcjhiikjfehhcbfnoookhp) browser extension:
+
+1. Log in to the site (e.g., YouTube)
+2. Click the extension and export as `cookies.txt`
+3. Place it into the `cookies` folder
+
+MEDIS will automatically use it during downloads
+
+> ⚠️ Keep your cookies file secure. It may contain sensitive login data
+
+---
+
+## 💻 Option 2: Run Locally with Node.js (Development)
 
 1. Clone the repo:
 
