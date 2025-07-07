@@ -92,7 +92,7 @@ cookies/
 
 #### The cookies.txt file must be in Netscape HTTP Cookie File format
 
-Use the [Get cookies.txt](https://chrome.google.com/webstore/detail/get-cookiestxt/lopibhbgjfbcjhiikjfehhcbfnoookhp) browser extension:
+Use the [Get cookies.txt LOCALLY](https://chromewebstore.google.com/detail/cclelndahbckbenkjhflpdbgdldlbecc?utm_source=item-share-cb) browser extension:
 
 1. Log in to the site (e.g., YouTube)
 2. Click the extension and export as `cookies.txt`
@@ -122,7 +122,7 @@ npm install
 3. Run the server:
 
 ```bash
-node server.js
+npm run dev
 ```
 
 Access the app at:
