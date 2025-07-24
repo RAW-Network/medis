@@ -1,16 +1,30 @@
-const videoService = require('../../services/video.service');
 const YTDlpWrap = require('yt-dlp-wrap').default;
+const cache = require('../../utils/cache');
+const videoService = require('../../services/video.service');
 const CustomError = require('../../utils/CustomError');
 const ytdlp = new YTDlpWrap();
 
+const VERSION_CACHE_KEY = 'versionInfo';
+const CACHE_TTL = 3600 * 1000;
+
 exports.getVersion = async (req, res, next) => {
+  const cachedVersions = cache.get(VERSION_CACHE_KEY);
+  if (cachedVersions) {
+    return res.json(cachedVersions);
+  }
+
   try {
     const medisPackage = require('../../../package.json');
     const ytdlpVersion = await ytdlp.getVersion();
-    res.json({
+    
+    const versions = {
       medis: medisPackage.version || '1.0.0',
       ytdlp: ytdlpVersion,
-    });
+    };
+
+    cache.set(VERSION_CACHE_KEY, versions, CACHE_TTL);
+
+    res.json(versions);
   } catch (error) {
     console.error('Failed to get version info:', error);
     res.status(500).json({ medis: '1.0.0', ytdlp: 'N/A' });

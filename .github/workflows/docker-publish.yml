@@ -45,7 +45,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Check if image exists
+        id: check_image
+        run: |
+          docker manifest inspect ghcr.io/${{ steps.lower_repo_name.outputs.REPO_LOWER }}:${{ steps.get_version.outputs.VERSION }}
+        continue-on-error: true
+
       - name: Build and push Docker image
+        if: steps.check_image.outcome == 'failure'
         uses: docker/build-push-action@v6
         with:
           context: .
