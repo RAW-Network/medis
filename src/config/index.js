@@ -1,5 +1,5 @@
 const path = require('path');
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 
 const config = {
   port: process.env.PORT || 3000,

@@ -14,23 +14,111 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalText = document.getElementById('modal-text');
     const modalCancelBtn = document.getElementById('modal-cancel-btn');
     const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+    const themeButton = document.getElementById('theme-button');
+    const themeDropdown = document.getElementById('theme-dropdown');
+    const themeText = themeButton.querySelector('.theme-text');
 
     const ICONS = {
         copy: `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>`,
         trash: `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`,
-        copied: `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`
+        copied: `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
+        success: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.58L19 8l-9 9z"/></svg>`,
+        error: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>`,
+        info: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`,
+        close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>`
     };
 
-    function showToast(message, type = 'info') {
+    const THEMES = {
+        light: 'Light',
+        dark: 'Dark',
+        system: 'Auto'
+    };
+
+    function getSystemTheme() {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function getCurrentTheme() {
+        return localStorage.getItem('theme') || 'system';
+    }
+
+    function setTheme(theme) {
+        localStorage.setItem('theme', theme);
+        applyTheme(theme);
+        updateThemeUI(theme);
+    }
+
+    function applyTheme(theme) {
+        const actualTheme = theme === 'system' ? getSystemTheme() : theme;
+        document.documentElement.setAttribute('data-theme', actualTheme);
+    }
+
+    function updateThemeUI(theme) {
+        themeText.textContent = THEMES[theme];
+
+        document.querySelectorAll('.theme-option').forEach(option => {
+            option.classList.toggle('active', option.dataset.theme === theme);
+        });
+    }
+
+    function initTheme() {
+        const currentTheme = getCurrentTheme();
+        applyTheme(currentTheme);
+        updateThemeUI(currentTheme);
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (getCurrentTheme() === 'system') {
+                applyTheme('system');
+            }
+        });
+    }
+
+    function toggleThemeDropdown() {
+        themeDropdown.classList.toggle('show');
+    }
+
+    function hideThemeDropdown() {
+        themeDropdown.classList.remove('show');
+    }
+
+    function showToast(message, type = 'info', duration = 5000) {
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        toast.textContent = message;
+
+        const iconMap = {
+            success: ICONS.success,
+            error: ICONS.error,
+            info: ICONS.info
+        };
+
+        toast.innerHTML = `
+            <div class="toast-icon">${iconMap[type] || ICONS.info}</div>
+            <div class="toast-content">${message}</div>
+            <button class="toast-close" aria-label="Close notification">
+                ${ICONS.close}
+            </button>
+        `;
+
+        const closeBtn = toast.querySelector('.toast-close');
+        closeBtn.addEventListener('click', () => hideToast(toast));
         toastContainer.appendChild(toast);
         setTimeout(() => toast.classList.add('show'), 10);
-        setTimeout(() => {
-            toast.classList.remove('show');
-            toast.addEventListener('transitionend', () => toast.remove());
-        }, 5000);
+
+        const timeoutId = setTimeout(() => hideToast(toast), duration);
+        toast.timeoutId = timeoutId;
+        return toast;
+    }
+
+    function hideToast(toast) {
+        if (toast.timeoutId) {
+            clearTimeout(toast.timeoutId);
+        }
+
+        toast.classList.remove('show');
+        toast.addEventListener('transitionend', () => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, { once: true });
     }
 
     function playVideo(event) {
@@ -231,7 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (confirmed) {
                         const buttons = card.querySelectorAll('.action-btn');
                         buttons.forEach(btn => btn.disabled = true);
-                        deleteBtn.innerHTML = `<div class="spinner-overlay"><div class="spinner"></div></div>` + ICONS.trash + ' <span>Deleting...</span>';
+                        deleteBtn.innerHTML = `<div class="spinner-overlay"><div class="loading-spinner"></div></div>` + ICONS.trash + ' <span>Deleting...</span>';
                         try {
                             const response = await fetch(`${API_URL}/videos/${video.id}`, { method: 'DELETE' });
                             if (!response.ok) {
@@ -286,14 +374,19 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchVersionInfo() {
         try {
             const response = await fetch(`${API_URL}/version`);
-            if (!response.ok) throw new Error('Failed to fetch version');
+            if (!response.ok) {
+                const errorText = await response.text().catch(() => 'Unknown error');
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
+            }
             const versions = await response.json();
-            document.getElementById('medis-version').textContent = versions.medis;
-            document.getElementById('ytdlp-version').textContent = versions.ytdlp;
+
+            document.getElementById('medis-version').textContent = versions.medis || '1.0.0';
+            document.getElementById('ytdlp-version').textContent = versions.ytdlp || 'N/A';
         } catch (error) {
-            console.error(error);
+            console.error('Version fetch error:', error.message);
             document.getElementById('medis-version').textContent = '1.0.0';
             document.getElementById('ytdlp-version').textContent = 'N/A';
+
         }
     }
 
@@ -302,6 +395,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') handleDownload();
     });
 
+    themeButton.addEventListener('click', toggleThemeDropdown);
+
+    document.querySelectorAll('.theme-option').forEach(option => {
+        option.addEventListener('click', () => {
+            setTheme(option.dataset.theme);
+            hideThemeDropdown();
+        });
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.theme-switcher')) {
+            hideThemeDropdown();
+        }
+    });
+
+    initTheme();
     fetchAndRenderVideos();
     connectWebSocket();
     fetchVersionInfo();
