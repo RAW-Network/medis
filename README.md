@@ -6,7 +6,7 @@ A self-hosted media fetcher and sharer that lets you download and embed videos f
 
 🔍 Preview
 
-<img src="https://files.catbox.moe/y9k2r0.gif" alt="App Preview" width="600">
+<img src="https://files.catbox.moe/xcra7z.gif" alt="App Preview" width="600">
 
 ---
 
