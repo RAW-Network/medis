@@ -104,6 +104,38 @@ MEDIS will automatically use it during downloads
 
 ---
 
+## 📦 Manual Update [`yt-dlp`](https://github.com/yt-dlp/yt-dlp-nightly-builds) to Nightly Version
+
+Sometimes, `yt-dlp` may stop working or have trouble downloading videos. If this happens, you can easily update it to the **nightly** version from inside the Docker container to get the latest fixes and improvements.
+
+### 🔄 Manual Update Steps
+
+1. **Ensure the `medis` container is running**
+   Check with:
+
+   ```bash
+   docker ps
+   ```
+
+2. **Run the update command to switch to the nightly build:**
+
+   ```bash
+   docker exec medis yt-dlp --update-to nightly
+   ```
+
+3. **Restart the `medis` container** to apply the update:
+
+   ```bash
+   docker restart medis
+   ```
+
+### 🧠 Notes
+
+* This update will **remain active until the container is removed or rebuilt**
+* For long-term stability, consider updating the Docker image to include the latest version of `yt-dlp`
+
+---
+
 ## 💻 Option 2: Run Locally with Node.js (Development)
 
 1. Clone the repo:
