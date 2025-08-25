@@ -15,7 +15,7 @@ A self-hosted media fetcher and sharer that lets you download and embed videos f
 * 🔗 Download videos from any URL using `yt-dlp`
 * 🎞️ Embed and share videos with rich Open Graph previews
 * ⚡ Real-time progress updates with WebSocket
-* 🔄 Persistent download history with JSON metadata
+* 🔄 Persistent download history with SQLLite
 * 🌚 Sleek, dark-themed responsive UI
 * 🐳 Dockerized and portable for any server
 
