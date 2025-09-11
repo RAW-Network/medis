@@ -8,6 +8,7 @@ const config = {
   videosPath: path.resolve(__dirname, '../../storage/videos'),
   cookiesPath: path.resolve(__dirname, '../../storage/cookies'),
   dbPath: path.resolve(__dirname, '../../storage/videos/medis.db'),
+  autoUpdateYtdlp: process.env.AUTO_UPDATE_YTDLP === 'true',
 };
 
 module.exports = config;
