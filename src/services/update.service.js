@@ -4,7 +4,7 @@ const YTDlpWrap = require('yt-dlp-wrap').default;
 const ytdlp = new YTDlpWrap();
 
 const checkForUpdates = async () => {
-  console.log('[Updater] Checking for yt-dlp updates...');
+  console.log('[Updater] Checking for yt-dlp updates');
   try {
     const currentVersion = await ytdlp.getVersion();
     await new Promise((resolve, reject) => {
@@ -14,7 +14,7 @@ const checkForUpdates = async () => {
           return reject(error);
         }
         if (stdout.includes('yt-dlp is up to date')) {
-          console.log(`[Updater] yt-dlp is already at the latest version (${currentVersion}).`);
+          console.log(`[Updater] yt-dlp is already at the latest version (${currentVersion})`);
         } else {
           console.log(`[Updater] yt-dlp has been updated successfully. Details: ${stdout}`);
         }
@@ -27,7 +27,6 @@ const checkForUpdates = async () => {
 };
 
 exports.scheduleYtdlpUpdate = () => {
-  console.log('[Updater] Service initialized. yt-dlp auto-update is enabled.');
   setTimeout(checkForUpdates, 60 * 1000); 
   setInterval(checkForUpdates, 24 * 60 * 60 * 1000);
 };
