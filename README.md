@@ -43,6 +43,7 @@ services:
     environment:
       - TZ=UTC
       - MAX_QUEUE_LIMIT=5
+      - AUTO_UPDATE_YTDLP=false
     restart: unless-stopped
 ```
 
@@ -70,10 +71,11 @@ docker compose down
 
 Customize with environment variables (if needed):
 
-| Variable          | Description                    | Default |
-| ----------------- | ------------------------------ | ------- |
-| `TZ`              | The timezone for the container | `UTC`   |
-| `MAX_QUEUE_LIMIT` | Maximum total jobs limit       | `5`     |
+| Variable            | Description                    | Default |
+| ------------------- | ------------------------------ | ------- |
+| `TZ`                | The timezone for the container | `UTC`   |
+| `MAX_QUEUE_LIMIT`   | Maximum total jobs limit       | `5`     |
+| `AUTO_UPDATE_YTDLP` | Auto Update YTDLP Version      | `false` |
 
 ---
 
@@ -194,6 +196,7 @@ medis/
 │   │   └── database.js
 │   ├── services/
 │   │   ├── download.service.js
+│   │   ├── update.service.js
 │   │   ├── video.service.js
 │   │   └── websocket.service.js
 │   ├── utils/
