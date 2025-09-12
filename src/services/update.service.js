@@ -28,7 +28,6 @@ const checkForUpdates = async () => {
 };
 
 exports.scheduleYtdlpUpdate = () => {
-  console.log('[Updater] Service initialized, scheduling first check in 60 seconds');
   setTimeout(checkForUpdates, 60 * 1000); 
   setInterval(checkForUpdates, 24 * 60 * 60 * 1000);
 };
