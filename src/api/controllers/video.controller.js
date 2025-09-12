@@ -3,14 +3,14 @@ const downloadService = require('../../services/download.service');
 const { isValidUrl } = require('../../utils/security');
 const CustomError = require('../../utils/CustomError');
 
-exports.downloadVideo = (req, res, next) => {
+exports.downloadVideo = async (req, res, next) => {
     const { url } = req.body;
     try {
         if (!url || !isValidUrl(url)) {
             throw new CustomError('URL is invalid or not allowed.', 400);
         }
         console.log(`[API] POST /api/download - Request received for URL: ${url}`);
-        const result = downloadService.addToQueue(url);
+        const result = await downloadService.processUrl(url);
         res.status(result.status).json({ message: result.message });
     } catch (error) {
         next(error);

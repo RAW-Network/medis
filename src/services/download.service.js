@@ -7,15 +7,63 @@ const config = require('../config');
 const videoService = require('./video.service');
 const websocketService = require('./websocket.service');
 const CustomError = require('../utils/CustomError');
+const { isPlaylistUrl } = require('../utils/security');
 
 const ytdlp = new YTDlpWrap();
 const downloadQueue = [];
 let activeDownloads = 0;
 
+exports.processUrl = async (url) => {
+  if (isPlaylistUrl(url)) {
+    console.log(`[Queue] Playlist detected. Fetching up to ${config.playlistDownloadLimit} video entries`);
+    
+    const playlistItemsArgs = [
+      url,
+      '--flat-playlist',
+      '--dump-json',
+      '--playlist-end', config.playlistDownloadLimit
+    ];
+
+    try {
+      const stdout = await ytdlp.execPromise(playlistItemsArgs);
+      const videoInfos = stdout.trim().split('\n').map(line => JSON.parse(line));
+
+      if (videoInfos.length === 0) {
+        throw new CustomError('Could not find any videos in the provided playlist', 404);
+      }
+
+      if (activeDownloads + downloadQueue.length + videoInfos.length > config.maxQueueLimit) {
+        throw new CustomError(`Adding ${videoInfos.length} videos would exceed the queue limit (max: ${config.maxQueueLimit})`, 429);
+      }
+
+      videoInfos.forEach(video => {
+        if (video.url) {
+          exports.addToQueue(video.url);
+        }
+      });
+
+      return { status: 202, message: `Playlist processed. Added ${videoInfos.length} videos to the queue` };
+
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+
+      console.error('[Playlist] Failed to process playlist URL', error);
+      if (error.message.includes('Sign in') || error.message.includes('private')) {
+        throw new CustomError('This playlist is private or requires login', 403);
+      }
+      throw new CustomError('Failed to fetch playlist details. The playlist may be empty or invalid', 500);
+    }
+  } else {
+    return exports.addToQueue(url);
+  }
+};
+
 exports.addToQueue = (url) => {
   if (activeDownloads + downloadQueue.length >= config.maxQueueLimit) {
     console.warn(`[Queue] Total job limit reached. Rejecting new download request. Limit: ${config.maxQueueLimit}`);
-    throw new CustomError(`Queue limit reached (max: ${config.maxQueueLimit}). Please try again later.`, 429);
+    throw new CustomError(`Queue limit reached (max: ${config.maxQueueLimit}). Please try again later`, 429);
   }
 
   const jobId = uuidv4();
@@ -102,7 +150,7 @@ async function downloadThumbnail(thumbnailUrl, videoId) {
         });
         return `/videos/${thumbnailFilename}`;
     } catch (err) {
-        console.error('[AXIOS-ERROR] Failed to download thumbnail:', err.message);
+        console.error('[AXIOS-ERROR] Failed to download thumbnail', err.message);
         return '';
     }
 }
@@ -154,10 +202,10 @@ function handleDownloadError(error, videoId) {
     else if (errorMessage.includes('404')) userMessage = 'Could not find the video. Please check the URL';
     else if (errorMessage.includes('metadata extraction failed')) userMessage = 'Failed to get video info. The URL might be incorrect or private';
 
-    console.error(`[Backend Error] For video ${videoId}:`, error.message);
+    console.error(`[Backend Error] For video ${videoId}`, error.message);
     websocketService.broadcast({ type: 'downloadError', message: userMessage, videoId });
     cleanupIncompleteFiles(videoId).catch(cleanupErr => {
-        console.error(`[Cleanup] Nested error during cleanup for ${videoId}:`, cleanupErr);
+        console.error(`[Cleanup] Nested error during cleanup for ${videoId}`, cleanupErr);
     });
 }
 
@@ -170,6 +218,6 @@ async function cleanupIncompleteFiles(baseFilename) {
       }
     }
   } catch (err) {
-    console.error(`[Cleanup] Error during file cleanup for ${baseFilename}:`, err);
+    console.error(`[Cleanup] Error during file cleanup for ${baseFilename}`, err);
   }
 }

@@ -86,15 +86,15 @@ exports.cleanupOrphanedFiles = async () => {
 
     for (const file of diskFiles) {
         if (!validFiles.has(file)) {
-            console.log(`[Startup Cleanup] Found orphaned file: ${file}. Deleting...`);
+            console.log(`[Startup] Found orphaned file: ${file}. Deleting...`);
             await fs.promises.unlink(path.join(config.videosPath, file));
             deletedCount++;
         }
     }
 
     if (deletedCount > 0) {
-        console.log(`[Startup Cleanup] Finished. Removed ${deletedCount} orphaned files.`);
+        console.log(`[Startup] Finished. Removed ${deletedCount} orphaned files.`);
     } else {
-        console.log('[Startup Cleanup] No orphaned files found. System is clean!');
+        console.log('[Startup] No orphaned files found. System is clean!');
     }
 };

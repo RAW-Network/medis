@@ -8,18 +8,22 @@ exports.isValidUrl = (urlString) => {
       return false;
     }
 
-    const playlistRegex = /(\?|&)list=|(\/playlists\/)/;
-    if (playlistRegex.test(parsedUrl.search) || playlistRegex.test(parsedUrl.pathname)) {
-      console.warn(`[SECURITY] Playlist URL detected and blocked immediately: ${urlString}`);
-      return false;
-    }
-
     const { hostname } = parsedUrl;
     if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.') || hostname.startsWith('10.') || hostname.startsWith('172.')) {
         return false;
     }
 
     return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+exports.isPlaylistUrl = (urlString) => {
+  try {
+    const parsedUrl = new URL(urlString);
+    const playlistRegex = /(\?|&)list=|(\/playlists\/)/;
+    return playlistRegex.test(parsedUrl.search) || playlistRegex.test(parsedUrl.pathname);
   } catch (error) {
     return false;
   }

@@ -42,8 +42,9 @@ services:
       - ./cookies:/cookies
     environment:
       - TZ=UTC
-      - MAX_QUEUE_LIMIT=5
+      - MAX_QUEUE_LIMIT=10
       - AUTO_UPDATE_YTDLP=false
+      - PLAYLIST_DOWNLOAD_LIMIT=1
     restart: unless-stopped
 ```
 
@@ -71,11 +72,12 @@ docker compose down
 
 Customize with environment variables (if needed):
 
-| Variable            | Description                    | Default |
-| ------------------- | ------------------------------ | ------- |
-| `TZ`                | The timezone for the container | `UTC`   |
-| `MAX_QUEUE_LIMIT`   | Maximum total jobs limit       | `5`     |
-| `AUTO_UPDATE_YTDLP` | Auto Update YTDLP Version      | `false` |
+| Variable                  | Description                      | Default |
+| ------------------------- | -------------------------------- | ------- |
+| `TZ`                      | The timezone for the container   | `UTC`   |
+| `MAX_QUEUE_LIMIT`         | Maximum total jobs limit         | `10`    |
+| `AUTO_UPDATE_YTDLP`       | Auto Update YTDLP Version        | `false` |
+| `PLAYLIST_DOWNLOAD_LIMIT` | Maximum playlist download limit  | `1`     |
 
 ---
 

@@ -33,12 +33,13 @@ initializeWebSocket(wss);
     }
     
     server.listen(config.port, () => {
-      console.log(`[Server] MEDIS is running at http://localhost:${config.port}`);
+      console.log(`[Server] MEDIS is running and listening on port ${config.port}`);
       console.log(`[Config] Max queue limit: ${config.maxQueueLimit}`);
+      console.log(`[Config] Max playlist limit: ${config.playlistDownloadLimit}`);
       console.log(`[Config] Auto-update for yt-dlp: ${config.autoUpdateYtdlp ? 'enabled' : 'disabled'}`);
     });
   } catch (error) {
-    console.error('[Startup] Critical error on server startup:', error);
+    console.error('[Startup] Critical error on server startup', error);
     process.exit(1);
   }
 })();

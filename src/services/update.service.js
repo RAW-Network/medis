@@ -4,29 +4,31 @@ const YTDlpWrap = require('yt-dlp-wrap').default;
 const ytdlp = new YTDlpWrap();
 
 const checkForUpdates = async () => {
-  console.log('[Updater] Checking for yt-dlp updates');
+  console.log('[Updater] Running scheduled check for yt-dlp');
   try {
-    const currentVersion = await ytdlp.getVersion();
+    const currentVersion = (await ytdlp.getVersion()).trim();
     await new Promise((resolve, reject) => {
       const child = exec('yt-dlp --update', (error, stdout, stderr) => {
         if (error) {
-          console.error(`[Updater] Failed to update yt-dlp. Stderr: ${stderr}`);
+          console.error(`[Updater] ERROR: Update check failed. Stderr: ${stderr.trim()}`);
           return reject(error);
         }
+
         if (stdout.includes('yt-dlp is up to date')) {
-          console.log(`[Updater] yt-dlp is already at the latest version (${currentVersion})`);
+          console.log(`[Updater] INFO: yt-dlp is already up to date (v${currentVersion})`);
         } else {
-          console.log(`[Updater] yt-dlp has been updated successfully. Details: ${stdout}`);
+          console.log(`[Updater] SUCCESS: yt-dlp updated successfully. Output: ${stdout.trim()}`);
         }
         resolve();
       });
     });
   } catch (error) {
-    console.error(`[Updater] An error occurred during the yt-dlp update check:`, error);
+    console.error(`[Updater] FATAL: An exception occurred during the update process`, error);
   }
 };
 
 exports.scheduleYtdlpUpdate = () => {
+  console.log('[Updater] Service initialized, scheduling first check in 60 seconds');
   setTimeout(checkForUpdates, 60 * 1000); 
   setInterval(checkForUpdates, 24 * 60 * 60 * 1000);
 };

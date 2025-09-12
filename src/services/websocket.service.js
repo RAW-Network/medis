@@ -32,6 +32,6 @@ exports.cleanupOnStartup = async () => {
     try {
         await videoService.cleanupOrphanedFiles();
     } catch (err) {
-        console.error('[Startup Cleanup] An error occurred during cleanup:', err);
+        console.error('[Startup] An error occurred during cleanup:', err);
     }
 };
