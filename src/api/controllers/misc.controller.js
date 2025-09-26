@@ -40,7 +40,7 @@ exports.getSharePage = (req, res, next) => {
 
     const protocol = req.headers['x-forwarded-proto'] || req.protocol;
     const baseUrl = `${protocol}://${req.get('host')}`;
-    const videoUrl = `${baseUrl}/videos/${video.filename}`;
+    const videoUrl = `${baseUrl}/api/stream/${video.filename}`;
     const thumbnailUrl = video.thumbnailUrl ? `${baseUrl}${video.thumbnailUrl}` : '';
     const shareUrl = `${baseUrl}/share/${video.id}`;
     
@@ -76,7 +76,7 @@ exports.getSharePage = (req, res, next) => {
     </head>
     <body>
         <video controls autoplay playsinline>
-            <source src="/videos/${video.filename}" type="video/mp4">
+            <source src="/api/stream/${video.filename}" type="video/mp4">
             Your browser does not support the video tag.
         </video>
     </body>
