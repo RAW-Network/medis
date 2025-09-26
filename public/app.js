@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const placeholder = document.createElement('div');
                 placeholder.className = 'card-video-placeholder';
-                placeholder.dataset.src = `/videos/${video.filename}`;
+                placeholder.dataset.src = `/api/stream/${video.filename}`;
 
                 if (video.thumbnailUrl && video.thumbnailUrl.trim() !== '') {
                     placeholder.style.backgroundImage = `url('${video.thumbnailUrl}')`;
