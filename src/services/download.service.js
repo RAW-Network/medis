@@ -160,7 +160,7 @@ function executeDownload(url, videoData, commonArgs) {
         const { id: videoId, filename } = videoData;
         const downloadArgs = [
             url,
-            '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+            '-f', 'bestvideo[vcodec^=avc1]+bestaudio[acodec^=mp4a]/best[vcodec^=avc1]/best[ext=mp4]/best',
             '-o', path.join(config.videosPath, filename),
             '--progress',
             '--no-part',
