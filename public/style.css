@@ -8,9 +8,9 @@
   --text-muted: #656d76;
   --border-color: #30363d;
   --border-subtle: #21262d;
-  --primary-color: #58a6ff;
-  --primary-hover: #4895ef;
-  --primary-muted: rgba(88, 166, 255, 0.1);
+  --primary-color: #4185f4;
+  --primary-hover: #3367d6;
+  --primary-muted: rgba(65, 133, 244, 0.1);
   --success-color: #3fb950;
   --success-bg: rgba(63, 185, 80, 0.1);
   --danger-color: #f85149;
@@ -558,9 +558,8 @@ body {
     justify-content: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-sm);
-    background: var(--bg-elevated);
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
+    background: transparent;
+    border: 1px solid;
     border-radius: var(--radius-sm);
     cursor: pointer;
     font-size: 0.875rem;
@@ -572,21 +571,26 @@ body {
     overflow: hidden;
 }
 
+.action-btn.copy-btn {
+    color: var(--primary-color);
+    border-color: var(--primary-muted);
+}
+
+.action-btn.delete-btn {
+    color: var(--danger-color);
+    border-color: var(--danger-bg);
+}
+
 .action-btn:hover:not(:disabled) {
-    background: var(--bg-color);
-    color: var(--text-primary);
+    filter: brightness(1.2);
 }
 
 .action-btn.copy-btn:hover:not(:disabled) {
     background: var(--primary-muted);
-    color: var(--primary-color);
-    border-color: var(--primary-color);
 }
 
 .action-btn.delete-btn:hover:not(:disabled) {
     background: var(--danger-bg);
-    color: var(--danger-color);
-    border-color: var(--danger-color);
 }
 
 .action-btn:disabled {
@@ -622,7 +626,10 @@ body {
 
 .main-footer {
   margin-top: auto;
-  padding: var(--spacing) var(--spacing);
+  padding-top: 12px;
+  padding-bottom: 12px;
+  padding-left: var(--spacing);
+  padding-right: var(--spacing);
   border-top: 1px solid var(--border-color);
   background: var(--bg-surface);
 }
@@ -929,7 +936,10 @@ body {
   }
 
   .main-footer {
-    padding: var(--spacing-md) var(--spacing-md);
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
   }
 
   .card-actions {
@@ -1094,12 +1104,11 @@ body {
 
 @media (max-width: 767px) {
   .card-actions {
-    flex-direction: column;
-    gap: var(--spacing-xs);
+    flex-direction: row;
+    gap: var(--spacing-sm);
   }
 
   .action-btn {
-    width: 100%;
     justify-content: center;
   }
 }
