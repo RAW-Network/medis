@@ -6,7 +6,7 @@ A self-hosted media fetcher and sharer that lets you download and embed videos f
 
 🔍 Preview
 
-<img src="https://files.catbox.moe/xcra7z.gif" alt="App Preview" width="600">
+<img src="https://files.catbox.moe/mzcxbf.gif" alt="App Preview" width="600">
 
 ---
 
@@ -202,6 +202,7 @@ medis/
 │   │   ├── video.service.js
 │   │   └── websocket.service.js
 │   ├── utils/
+│   │   ├── cache.js
 │   │   ├── CustomError.js
 │   │   └── security.js
 │   ├── app.js
