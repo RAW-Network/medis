@@ -131,7 +131,9 @@ document.addEventListener('DOMContentLoaded', () => {
         videoPlayer.controls = true;
         videoPlayer.autoplay = true;
         videoPlayer.preload = 'auto';
-        placeholder.replaceWith(videoPlayer);
+
+        placeholder.parentNode.replaceChild(videoPlayer, placeholder);
+        videoPlayer.focus();
     }
 
     function connectWebSocket() {
