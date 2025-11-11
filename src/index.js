@@ -7,15 +7,10 @@ const { initializeWebSocket, cleanupOnStartup } = require('./services/websocket.
 const { scheduleYtdlpUpdate } = require('./services/update.service');
 
 function ensureDirectoriesExist() {
-  if (!fs.existsSync(config.storagePath)) {
-    fs.mkdirSync(config.storagePath, { recursive: true });
-  }
-  if (!fs.existsSync(config.cookiesPath)) {
-    fs.mkdirSync(config.cookiesPath, { recursive: true });
-  }
-  if (!fs.existsSync(config.videosPath)) {
-    fs.mkdirSync(config.videosPath, { recursive: true });
-  }
+  if (!fs.existsSync(config.storagePath)) fs.mkdirSync(config.storagePath, { recursive: true });
+  if (!fs.existsSync(config.cookiesPath)) fs.mkdirSync(config.cookiesPath, { recursive: true });
+  if (!fs.existsSync(config.videosPath)) fs.mkdirSync(config.videosPath, { recursive: true });
+  if (!fs.existsSync(config.thumbnailsPath)) fs.mkdirSync(config.thumbnailsPath, { recursive: true });
 }
 
 const server = http.createServer(app);
@@ -31,15 +26,15 @@ initializeWebSocket(wss);
     if (config.autoUpdateYtdlp) {
       scheduleYtdlpUpdate();
     }
-    
+
     server.listen(config.port, () => {
-      console.log(`[Server] MEDIS is running and listening on port ${config.port}`);
-      console.log(`[Config] Max queue limit: ${config.maxQueueLimit}`);
-      console.log(`[Config] Max playlist limit: ${config.playlistDownloadLimit}`);
-      console.log(`[Config] Auto-update for yt-dlp: ${config.autoUpdateYtdlp ? 'enabled' : 'disabled'}`);
+      console.log(`[Server] MEDIS running on port ${config.port}`);
+      console.log(`[Config] Max queue limit: ${config.maxQueueLimit !== null ? config.maxQueueLimit : 'No Limit'}`);
+      console.log(`[Config] Max playlist limit: ${config.playlistDownloadLimit !== null ? config.playlistDownloadLimit : 'No Limit'}`);
+      console.log(`[Config] Auto-update yt-dlp: ${config.autoUpdateYtdlp ? 'enabled' : 'disabled'}`);
     });
   } catch (error) {
-    console.error('[Startup] Critical error on server startup', error);
+    console.error('[Startup] Critical error during startup', error);
     process.exit(1);
   }
 })();

@@ -13,7 +13,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.resolve(__dirname, '../public')));
-app.use('/videos', express.static(path.join(config.videosPath)));
+
+app.use('/videos', express.static(config.videosPath));
+app.use('/thumbnails', express.static(config.thumbnailsPath));
 
 app.use('/api', videoRoutes);
 app.use('/', miscRoutes);

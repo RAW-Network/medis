@@ -7,8 +7,8 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./storage/videos:/videos
-      - ./storage/cookies:/cookies
+      - ./data:/data
+      - ./cookies:/cookies
     environment:
       - TZ=${TZ}
       - MAX_QUEUE_LIMIT=${MAX_QUEUE_LIMIT}

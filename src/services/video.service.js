@@ -5,15 +5,17 @@ const config = require('../config');
 const CustomError = require('../utils/CustomError');
 const websocketService = require('./websocket.service');
 
+const getVideoById = (id) => {
+  const stmt = db.prepare('SELECT * FROM videos WHERE id = ?');
+  return stmt.get(id);
+};
+
 exports.getAllVideos = () => {
   const stmt = db.prepare('SELECT * FROM videos ORDER BY createdAt DESC');
   return stmt.all();
 };
 
-exports.getVideoById = (id) => {
-  const stmt = db.prepare('SELECT * FROM videos WHERE id = ?');
-  return stmt.get(id);
-};
+exports.getVideoById = getVideoById;
 
 exports.createVideo = (videoData) => {
   const stmt = db.prepare(
@@ -32,20 +34,24 @@ exports.createVideo = (videoData) => {
 };
 
 exports.deleteVideoById = (id) => {
-  const video = this.getVideoById(id);
+  const video = getVideoById(id);
+
   if (!video) {
     throw new CustomError('Video not found in DB', 404);
   }
 
   const deleteTransaction = db.transaction(() => {
     try {
-      const videoFilePath = path.join(config.videosPath, video.filename);
-      if (fs.existsSync(videoFilePath)) {
-        fs.unlinkSync(videoFilePath);
+      if (video.filename) {
+        const videoFilePath = path.join(config.videosPath, video.filename);
+        if (fs.existsSync(videoFilePath)) {
+          fs.unlinkSync(videoFilePath);
+        }
       }
 
       if (video.thumbnailUrl) {
-        const thumbnailFilePath = path.join(config.videosPath, path.basename(video.thumbnailUrl));
+        const thumbnailFile = path.basename(video.thumbnailUrl);
+        const thumbnailFilePath = path.join(config.thumbnailsPath, thumbnailFile);
         if (fs.existsSync(thumbnailFilePath)) {
           fs.unlinkSync(thumbnailFilePath);
         }
@@ -53,6 +59,7 @@ exports.deleteVideoById = (id) => {
 
       const stmt = db.prepare('DELETE FROM videos WHERE id = ?');
       const info = stmt.run(id);
+
       if (info.changes === 0) {
         throw new Error('Deletion from database failed unexpectedly.');
       }
@@ -65,36 +72,57 @@ exports.deleteVideoById = (id) => {
   try {
     deleteTransaction();
     websocketService.broadcast({ type: 'videoDeleted', videoId: id });
-  } catch(err) {
+  } catch (err) {
     console.error(`[SQLite Error] Transaction failed for deleting video ${id}:`, err);
     throw new CustomError('Failed to delete video due to a server error', 500);
   }
 };
 
 exports.cleanupOrphanedFiles = async () => {
-    const getDbFilesStmt = db.prepare('SELECT filename, thumbnailUrl FROM videos');
-    const dbVideos = getDbFilesStmt.all();
+  const getDbFilesStmt = db.prepare('SELECT filename, thumbnailUrl FROM videos');
+  const dbVideos = getDbFilesStmt.all();
 
-    const validFiles = new Set(['medis.db', 'medis.db-shm', 'medis.db-wal']);
-    dbVideos.forEach(video => {
-        if (video.filename) validFiles.add(video.filename);
-        if (video.thumbnailUrl) validFiles.add(path.basename(video.thumbnailUrl));
-    });
+  const validVideoFiles = new Set();
+  const validThumbnailFiles = new Set();
 
-    const diskFiles = await fs.promises.readdir(config.videosPath);
-    let deletedCount = 0;
+  dbVideos.forEach((video) => {
+    if (video.filename) {
+      validVideoFiles.add(video.filename);
+    }
+    if (video.thumbnailUrl) {
+      validThumbnailFiles.add(path.basename(video.thumbnailUrl));
+    }
+  });
 
-    for (const file of diskFiles) {
-        if (!validFiles.has(file)) {
-            console.log(`[Startup] Found orphaned file: ${file}. Deleting...`);
-            await fs.promises.unlink(path.join(config.videosPath, file));
-            deletedCount++;
-        }
+  try {
+    const videoDiskFiles = await fs.promises.readdir(config.videosPath);
+    let deletedVideoCount = 0;
+
+    for (const file of videoDiskFiles) {
+      if (!validVideoFiles.has(file)) {
+        await fs.promises.unlink(path.join(config.videosPath, file));
+        deletedVideoCount++;
+      }
     }
 
-    if (deletedCount > 0) {
-        console.log(`[Startup] Finished. Removed ${deletedCount} orphaned files.`);
+    const thumbnailDiskFiles = await fs.promises.readdir(config.thumbnailsPath);
+    let deletedThumbCount = 0;
+
+    for (const file of thumbnailDiskFiles) {
+      if (!validThumbnailFiles.has(file)) {
+        await fs.promises.unlink(path.join(config.thumbnailsPath, file));
+        deletedThumbCount++;
+      }
+    }
+
+    if (deletedVideoCount > 0 || deletedThumbCount > 0) {
+      console.log(
+        `[Startup] Removed ${deletedVideoCount} orphaned video files and ${deletedThumbCount} orphaned thumbnail files.`
+      );
     } else {
-        console.log('[Startup] No orphaned files found. System is clean!');
+      console.log('[Startup] No orphaned files found. System is clean!');
     }
+  } catch (err) {
+    console.error('[Startup] Error while cleaning orphaned files', err);
+  }
 };

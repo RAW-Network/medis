@@ -6,4 +6,5 @@ pids
 *.seed
 *.pid.lock
 .env
-storage
+cookies
+data

@@ -38,7 +38,7 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./videos:/videos
+      - ./data:/data
       - ./cookies:/cookies
     environment:
       - TZ=UTC
@@ -72,12 +72,12 @@ docker compose down
 
 Customize with environment variables (if needed):
 
-| Variable                  | Description                      | Default |
-| ------------------------- | -------------------------------- | ------- |
-| `TZ`                      | The timezone for the container   | `UTC`   |
-| `MAX_QUEUE_LIMIT`         | Maximum total jobs limit         | `10`    |
-| `AUTO_UPDATE_YTDLP`       | Auto Update YTDLP Version        | `false` |
-| `PLAYLIST_DOWNLOAD_LIMIT` | Maximum playlist download limit  | `1`     |
+| Variable                  | Description                      | Default   |
+| ------------------------- | -------------------------------- | -------   |
+| `TZ`                      | The timezone for the container   | `UTC`     |
+| `MAX_QUEUE_LIMIT`         | Maximum total jobs limit         | `No Limit`|
+| `AUTO_UPDATE_YTDLP`       | Auto Update YTDLP Version        | `false`   |
+| `PLAYLIST_DOWNLOAD_LIMIT` | Maximum playlist download limit  | `No Limit`|
 
 ---
 
@@ -213,9 +213,10 @@ medis/
 │   ├── app.js
 │   └── style.css
 │
-├── storage/
+├── data/
 │   ├── videos/
-│   └── cookies/
+│   └── thumbnail/
+├── cookies/
 │
 ├── .dockerignore
 ├── .gitignore
