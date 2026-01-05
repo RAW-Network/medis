@@ -1,6 +1,6 @@
 # ----------- Stage 1: Builder -----------
 # Install Node.js dependencies and prepare the application code
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 # Set working directory for builder
 WORKDIR /app
@@ -15,7 +15,7 @@ COPY . .
 
 # ----------- Stage 2: Production -----------
 # Create a clean, secure production image
-FROM node:20-alpine
+FROM node:22-alpine
 
 # Install required system dependencies and yt-dlp
 RUN apk update && apk upgrade && apk add --no-cache \
