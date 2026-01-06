@@ -16,4 +16,4 @@ chown -R medis:medis /data
 chown -R medis:medis /cookies
 
 # Start the application using dumb-init
-exec /usr/bin/dumb-init -- su-exec app "$@"
+exec /usr/bin/dumb-init -- su-exec medis "$@"
