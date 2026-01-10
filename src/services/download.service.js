@@ -137,8 +137,7 @@ async function startDownload({ url, jobId }) {
     websocketService.broadcast({
       type: 'progress',
       stage: 'FETCHING_METADATA',
-      message: 'Fetching Video Info',
-      percent: 0,
+      message: 'Fetching Metadata',
       videoId
     });
 
