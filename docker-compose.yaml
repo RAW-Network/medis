@@ -1,0 +1,17 @@
+services:
+  medis:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: medis
+    ports:
+      - 3000:3000
+    volumes:
+      - ./data:/data
+      - ./cookies:/cookies
+    environment:
+      - TZ=${TZ}
+      - MAX_QUEUE_LIMIT=${MAX_QUEUE_LIMIT}
+      - AUTO_UPDATE_YTDLP=${AUTO_UPDATE_YTDLP}
+      - PLAYLIST_DOWNLOAD_LIMIT=${PLAYLIST_DOWNLOAD_LIMIT}
+    restart: unless-stopped
