@@ -1,7 +1,7 @@
 {
-  "name": "app",
-  "version": "1.0.0",
-  "description": "",
+  "name": "medis",
+  "version": "1.0.1",
+  "description": "Media Embedding Delivery for Interactive Sharing",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
@@ -11,9 +11,9 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "axios": "^1.13.2",
-    "better-sqlite3": "^12.6.0",
-    "cors": "^2.8.5",
+    "axios": "^1.13.4",
+    "better-sqlite3": "^12.6.2",
+    "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "uuid": "^13.0.0",

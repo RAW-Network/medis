@@ -1,19 +1,34 @@
 #!/bin/sh
+set -e
 
-# Define the main application directory
+# Define core directories
+DATA_DIR="/data"
+COOKIES_DIR="/cookies"
 APP_DIR="/home/app/medis"
 
-# Ensure persistent storage directories exist for videos and cookies
-mkdir -p /data
-mkdir -p /cookies
+# Ensure external volume directories exist
+if [ ! -d "$DATA_DIR" ]; then
+    mkdir -p "$DATA_DIR"
+fi
 
-# Create symbolic links from app storage to persistent Docker volumes
-ln -sfn /data ${APP_DIR}/data
-ln -sfn /cookies ${APP_DIR}/cookies
+if [ ! -d "$COOKIES_DIR" ]; then
+    mkdir -p "$COOKIES_DIR"
+fi
 
-# Set ownership for persistent storage directories
-chown -R medis:medis /data
-chown -R medis:medis /cookies
+# Create symbolic links to map internal app folders to external volumes
+ln -sfn "$DATA_DIR" "${APP_DIR}/data"
+ln -sfn "$COOKIES_DIR" "${APP_DIR}/cookies"
 
-# Start the application using dumb-init
-exec /usr/bin/dumb-init -- su-exec medis "$@"
+# Run chown if ownership is incorrect
+if [ "$(stat -c %U "$DATA_DIR")" != "medis" ]; then
+    echo "[Entrypoint] Fixing permissions for $DATA_DIR..."
+    chown -R medis:medis "$DATA_DIR"
+fi
+
+if [ "$(stat -c %U "$COOKIES_DIR")" != "medis" ]; then
+    echo "[Entrypoint] Fixing permissions for $COOKIES_DIR..."
+    chown -R medis:medis "$COOKIES_DIR"
+fi
+
+# Execute the application
+exec su-exec medis "$@"
