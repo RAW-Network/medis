@@ -1,14 +1,15 @@
 # STAGE 1: Builder
 FROM node:24-alpine AS builder
+
 WORKDIR /app
 
-# Install build tools
+# Install native build tools
 RUN apk add --no-cache python3 make g++
 
-# Copy package files first to leverage Docker layer caching
+# Copy package
 COPY package*.json ./
 
-# Install dependencies
+# Install all dependencies
 RUN npm ci
 
 # Prune development dependencies
@@ -17,9 +18,14 @@ RUN npm prune --production
 
 # STAGE 2: Production
 FROM node:24-alpine AS runner
-ENV NODE_ENV=production
 
-# Install Runtime Dependencies
+ENV NODE_ENV=production
+ENV APP_DIR=/home/app/medis
+
+# Create a dedicated system user and group
+RUN addgroup -S medis && adduser -S medis -G medis
+
+# Install runtime dependencies
 RUN apk add --no-cache \
     python3 \
     ffmpeg \
@@ -28,31 +34,29 @@ RUN apk add --no-cache \
     ca-certificates \
     curl
 
-# Setup User & Group
-RUN addgroup -S medis && adduser -S medis -G medis
+# Switch to the application directory
+WORKDIR ${APP_DIR}
 
-# Download yt-dlp
-RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
-    && chmod a+rx /usr/local/bin/yt-dlp \
-    && chown medis:medis /usr/local/bin/yt-dlp
-
-WORKDIR /home/app/medis
-
-# Copy production node_modules from the builder stage
+# Copy production dependencies
 COPY --from=builder /app/node_modules ./node_modules
 
-# Copy application source code
+# Copy application code and scripts
 COPY package*.json ./
 COPY src ./src
 COPY public ./public
 COPY entrypoint.sh ./entrypoint.sh
 
-# Setup storage directories and permissions
-RUN mkdir -p storage cookies \
+# Download yt-dlp to application's local bin folder and setup required directories
+RUN mkdir -p bin storage cookies \
+    && curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o bin/yt-dlp \
+    && chmod a+rx bin/yt-dlp \
     && chmod +x ./entrypoint.sh \
-    && chown -R medis:medis /home/app/medis
+    && chown -R medis:medis ${APP_DIR}
 
-# Expose Application Port
+# Add local bin to PATH so yt-dlp can be discovered globally by the app
+ENV PATH="${APP_DIR}/bin:$PATH"
+
+# Expose HTTP port
 EXPOSE 3000
 
 # RUN The Application
