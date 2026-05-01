@@ -1,0 +1,43 @@
+/* base.css - Base reset and global utility classes */
+
+@import url('./variables.css');
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  color: var(--text);
+  background:
+    radial-gradient(900px 520px at 14% 6%,  rgba(79, 140, 255, .14), transparent 62%),
+    radial-gradient(900px 520px at 92% 8%,  rgba(134, 183, 255, .10), transparent 60%),
+    radial-gradient(900px 620px at 50% 112%, rgba(52, 211, 153, .06), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, .02), transparent 28%),
+    linear-gradient(180deg, var(--bg0), var(--bg1) 55%, var(--bg2));
+}
+
+/* Utility */
+.hidden { display: none !important; }
+
+/* Focus ring */
+.url-input:focus,
+.download-button:focus,
+.action-btn:focus,
+.modal-button:focus {
+  outline: 2px solid rgba(79, 140, 255, .58);
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

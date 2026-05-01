@@ -1,0 +1,55 @@
+/* feedback.css - Ephemeral UI */
+
+/* Progress Bar */
+.progress-container{flex:1;max-width:560px;min-width:0}
+.progress-bar{position:relative;height:36px;border-radius:999px;overflow:hidden;border:1px solid var(--stroke);background:var(--panel);box-shadow:inset 0 1px 2px rgba(0,0,0,.22),var(--shadow-sm)}
+.progress-fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg,rgba(47,107,255,.84),rgba(79,140,255,.96));transition:width .28s ease-out}
+.progress-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:0 14px;font-size:.86rem;font-weight:800;color:rgba(255,255,255,.92);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 10px rgba(0,0,0,.35);pointer-events:none}
+
+/* Loading State */
+.loading-state{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 14px;border-radius:14px;border:1px solid var(--stroke);background:var(--panel);color:var(--text2);font-size:.92rem}
+.loading-spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.14);border-top-color:rgba(79,140,255,.92);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Toast */
+.toast-container{position:fixed;bottom:84px;right:0;left:0;z-index:2000;display:flex;flex-direction:column;align-items:center;gap:12px;pointer-events:none}
+.toast{display:flex;align-items:center;gap:12px;padding:14px 20px;border-radius:99px;font-size:.92rem;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,0.4);border:1px solid var(--stroke);opacity:0;transform:translateY(24px) scale(.95);transition:all .4s cubic-bezier(0.19,1,0.22,1);pointer-events:auto;min-width:min(320px,90vw);background:rgba(18,24,38,0.82);backdrop-filter:blur(16px);color:var(--text)}
+.toast.show{opacity:1;transform:translateY(0) scale(1)}
+.toast-icon{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.toast-content{flex:1;line-height:1.4}
+
+.toast.success{border-color:rgba(52,211,153,0.22);box-shadow:0 8px 40px rgba(52,211,153,0.12)}
+.toast.success .toast-icon{color:var(--ok)}
+.toast.error{border-color:rgba(255,90,115,0.22);box-shadow:0 8px 40px rgba(255,90,115,0.12)}
+.toast.error .toast-icon{color:var(--bad)}
+.toast.info{border-color:rgba(79,140,255,0.22);box-shadow:0 8px 40px rgba(79,140,255,0.12)}
+.toast.info .toast-icon{color:var(--accent)}
+
+.toast-close{background:transparent;border:none;color:var(--text2);cursor:pointer;padding:4px;border-radius:50%;transition:var(--t);display:flex;align-items:center;justify-content:center;margin-left:4px}
+.toast-close:hover{color:var(--text);background:rgba(255,255,255,.1)}
+.toast-close svg{width:16px;height:16px}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;z-index:3000;opacity:0;transition:opacity .25s ease}
+.modal-overlay.visible{opacity:1}
+
+.modal-content{width:min(92vw,420px);background:rgba(18,23,35,.96);border-radius:28px;border:1px solid var(--stroke);box-shadow:0 40px 90px rgba(0,0,0,.6);padding:32px;text-align:center;transform:scale(.94) translateY(10px);transition:transform .25s ease;overflow:hidden;display:flex;flex-direction:column;align-items:center}
+.modal-overlay.visible .modal-content{transform:scale(1) translateY(0)}
+
+.modal-header{display:none}
+
+.modal-icon-wrapper{width:82px;height:82px;margin:0 auto 22px;border-radius:50%;background:rgba(255,90,115,.12);border:1px solid rgba(255,90,115,.18);display:flex;align-items:center;justify-content:center;color:var(--bad);box-shadow:0 0 40px rgba(255,90,115,.25)}
+.modal-icon-wrapper svg{width:38px;height:38px}
+
+.custom-modal-title{font-family:var(--font-brand);font-size:1.35rem;font-weight:800;margin:0 0 8px;color:var(--text)}
+.modal-body{padding:0;margin:0;width:100%}
+.modal-message{font-size:.95rem;color:var(--text2);line-height:1.6;margin:0}
+
+.video-highlight{display:block;margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--stroke);font-weight:600;font-size:.9rem;color:var(--text);word-break:break-word}
+
+.modal-actions{margin-top:26px;display:flex;gap:12px;width:100%}
+.modal-button{flex:1;padding:14px;border-radius:14px;font-size:.95rem;font-weight:800;cursor:pointer;transition:all var(--t);border:1px solid transparent}
+.modal-button.secondary{background:transparent;border:1px solid rgba(255,255,255,.14);color:var(--text2)}
+.modal-button.secondary:hover{background:rgba(255,255,255,.08);color:var(--text)}
+.modal-button.danger{background:var(--bad);border:none;color:white;box-shadow:0 6px 18px rgba(255,90,115,.35)}
+.modal-button.danger:hover{background:#FF3E5C;box-shadow:0 10px 26px rgba(255,90,115,.45)}

@@ -1,6 +1,6 @@
 {
   "name": "medis",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Media Embedding Delivery for Interactive Sharing",
   "main": "src/index.js",
   "scripts": {
@@ -11,13 +11,13 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "axios": "^1.13.5",
-    "better-sqlite3": "^12.6.2",
+    "axios": "^1.15.2",
+    "better-sqlite3": "^12.9.0",
     "cors": "^2.8.6",
-    "dotenv": "^17.3.1",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "uuid": "^13.0.0",
-    "ws": "^8.19.0",
+    "uuid": "^14.0.0",
+    "ws": "^8.20.0",
     "yt-dlp-wrap": "^2.3.12"
   },
   "devDependencies": {
