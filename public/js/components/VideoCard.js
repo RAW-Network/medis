@@ -6,7 +6,6 @@ import { copyToClipboard } from '../utils/clipboard.js';
 import { showToast } from './Toast.js';
 import { showConfirmModal } from './Modal.js';
 import { deleteVideo } from '../api/client.js';
-import { refreshVideos } from './VideoLibrary.js';
 
 /** Replace a thumbnail placeholder with an inline video player */
 function _playVideo(event) {
@@ -117,7 +116,7 @@ function _createDeleteButton(video, card) {
     try {
       await deleteVideo(video.id);
       showToast('Video deleted', 'success');
-      await refreshVideos();
+      // Card removal is handled by the VIDEO_DELETED WebSocket event
     } catch (error) {
       showToast(error.message || 'Failed to delete video', 'error');
       buttons.forEach(b => b.disabled = false);

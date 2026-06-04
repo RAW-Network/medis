@@ -5,6 +5,9 @@ import { ICONS } from '../utils/icons.js';
 
 let _container = null;
 
+/** Maximum visible toasts at once */
+const MAX_TOASTS = 3;
+
 /** Icon mapping for toast types */
 const ICON_MAP = {
   success: ICONS.success,
@@ -18,24 +21,46 @@ export function initToast() {
 }
 
 /** Show a toast notification */
-export function showToast(message, type = 'info', duration = 4200) {
+export function showToast(message, type = 'info', duration = 4000) {
   if (!_container) _container = $('toast-container');
   if (!_container) return;
+
+  _enforceMaxToasts();
 
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   toast.innerHTML = `
     <div class="toast-icon">${ICON_MAP[type] || ICONS.info}</div>
     <div class="toast-content">${message}</div>
+    <button class="toast-close" type="button" aria-label="Close">
+      ${ICONS.close}
+    </button>
   `;
 
+  const closeBtn = toast.querySelector('.toast-close');
+  closeBtn.addEventListener('click', () => _removeToast(toast));
+
   _container.appendChild(toast);
-  setTimeout(() => toast.classList.add('show'), 40);
+  requestAnimationFrame(() => toast.classList.add('show'));
 
-  const removeToast = () => {
-    toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 350);
-  };
+  if (duration > 0) {
+    setTimeout(() => _removeToast(toast), duration);
+  }
+}
 
-  if (duration > 0) setTimeout(removeToast, duration);
+/** Remove a toast with fade-out */
+function _removeToast(toast) {
+  if (!toast || !toast.parentNode) return;
+  toast.classList.remove('show');
+  setTimeout(() => {
+    if (toast.parentNode) toast.remove();
+  }, 250);
+}
+
+/** Enforce max toast limit — remove oldest if over limit */
+function _enforceMaxToasts() {
+  const toasts = _container.querySelectorAll('.toast');
+  if (toasts.length >= MAX_TOASTS) {
+    _removeToast(toasts[0]);
+  }
 }

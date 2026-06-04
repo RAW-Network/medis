@@ -8,6 +8,10 @@ import { showToast } from './Toast.js';
 /** @type {HTMLButtonElement} */ let _btn;
 /** @type {HTMLElement} */ let _loading;
 
+/** Cooldown duration in milliseconds */
+const COOLDOWN_MS = 3000;
+let _cooldownTimer = null;
+
 /** Submit the current URL for download */
 async function _handleDownload() {
   const url = _input.value.trim();
@@ -23,12 +27,35 @@ async function _handleDownload() {
     const result = await requestDownload(url);
     showToast(result.message || 'Queued', 'info');
     _input.value = '';
+    _startCooldown();
   } catch (error) {
     showToast(error.message, 'error');
-  } finally {
     _btn.disabled = false;
+  } finally {
     _loading.classList.add('hidden');
   }
+}
+
+/** Start a cooldown period after successful submission */
+function _startCooldown() {
+  if (_cooldownTimer) clearInterval(_cooldownTimer);
+
+  let remaining = COOLDOWN_MS;
+  _btn.classList.add('cooldown');
+  _btn.querySelector('span').textContent = `Wait ${Math.ceil(remaining / 1000)}s`;
+
+  _cooldownTimer = setInterval(() => {
+    remaining -= 1000;
+    if (remaining <= 0) {
+      clearInterval(_cooldownTimer);
+      _cooldownTimer = null;
+      _btn.disabled = false;
+      _btn.classList.remove('cooldown');
+      _btn.querySelector('span').textContent = 'Download';
+    } else {
+      _btn.querySelector('span').textContent = `Wait ${Math.ceil(remaining / 1000)}s`;
+    }
+  }, 1000);
 }
 
 /** Initialise the download form component */
@@ -39,6 +66,6 @@ export function initDownloadForm() {
 
   _btn.addEventListener('click', _handleDownload);
   _input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') _handleDownload();
+    if (e.key === 'Enter' && !_btn.disabled) _handleDownload();
   });
 }

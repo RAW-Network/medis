@@ -1,27 +1,52 @@
-// services/websocket.js - WebSocket client with auto-reconnect
+// services/websocket.js - WebSocket client with exponential backoff reconnect
 
 import { getState, setState } from '../state/store.js';
 import { showToast } from '../components/Toast.js';
 
 let _socket = null;
 
-const RECONNECT_DELAY = 1200;
+/** Reconnection config */
+const RECONNECT = {
+  baseMs: 1200,
+  maxMs: 30000,
+  attempt: 0
+};
+
+/** Calculate delay with exponential backoff */
+function _getReconnectDelay() {
+  const delay = Math.min(
+    RECONNECT.baseMs * Math.pow(2, RECONNECT.attempt),
+    RECONNECT.maxMs
+  );
+  RECONNECT.attempt++;
+  return delay;
+}
 
 /** Establish a WebSocket connection and set up message routing */
 export function connect() {
   const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
   _socket = new WebSocket(`${protocol}://${window.location.host}`);
 
-  _socket.onclose = () => setTimeout(connect, RECONNECT_DELAY);
-
   _socket.onopen = () => {
+    RECONNECT.attempt = 0;
+
     if (getState('downloadingCount') > 0) {
       setState('progress:show', {});
     }
   };
 
+  _socket.onclose = () => {
+    const delay = _getReconnectDelay();
+    setTimeout(connect, delay);
+  };
+
   _socket.onmessage = (event) => {
-    const data = JSON.parse(event.data);
+    let data;
+    try {
+      data = JSON.parse(event.data);
+    } catch (_e) {
+      return;
+    }
 
     switch (data.type) {
       case 'status':
@@ -60,10 +85,14 @@ function _handleStatus(data) {
   }
 }
 
-/** Handle a 'downloadComplete' WebSocket message */
+/** Handle a 'downloadComplete' WebSocket message — prepend video directly */
 function _handleDownloadComplete(data) {
   const title = (data.video && data.video.title) ? data.video.title : 'Completed';
   showToast(`Downloaded: ${title}`, 'success');
-  setState('videos:refresh', {});
+
+  if (data.video && data.video.id) {
+    setState('video:prepend', { newVideo: data.video });
+  }
+
   setState('progress:idle', {});
 }

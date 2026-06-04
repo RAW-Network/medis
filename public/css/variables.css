@@ -7,17 +7,18 @@
   --bg2: #0B1326;
 
   /* Panels / Surfaces */
-  --panel:  rgba(255, 255, 255, .035);
-  --panel2: rgba(255, 255, 255, .055);
+  --panel:  rgba(255, 255, 255, .03);
+  --panel2: rgba(255, 255, 255, .05);
+  --panel3: rgba(255, 255, 255, .07);
 
   /* Text */
   --text:  rgba(255, 255, 255, .92);
-  --text2: rgba(255, 255, 255, .72);
-  --text3: rgba(255, 255, 255, .54);
+  --text2: rgba(255, 255, 255, .64);
+  --text3: rgba(255, 255, 255, .42);
 
   /* Borders / Strokes */
-  --stroke:  rgba(255, 255, 255, .10);
-  --stroke2: rgba(255, 255, 255, .16);
+  --stroke:  rgba(255, 255, 255, .08);
+  --stroke2: rgba(255, 255, 255, .14);
 
   /* Accent */
   --accent:  #4F8CFF;
@@ -30,15 +31,22 @@
   --warn: #FFB020;
 
   /* Shadows */
-  --shadow-sm: 0 10px 22px rgba(0, 0, 0, .22);
-  --shadow:    0 18px 50px rgba(0, 0, 0, .34);
-  --shadow-lg: 0 28px 90px rgba(0, 0, 0, .46);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, .18);
+  --shadow:    0 8px 24px rgba(0, 0, 0, .28);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, .36);
+
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius:    12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
 
   /* Typography */
   --font:       'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-brand: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   /* Transitions */
-  --t:  0.16s cubic-bezier(0.4, 0, 0.2, 1);
-  --ts: 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+  --t:  0.15s ease;
+  --ts: 0.25s ease;
 }

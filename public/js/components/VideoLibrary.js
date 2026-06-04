@@ -8,10 +8,10 @@ import { createVideoCard } from './VideoCard.js';
 /** @type {HTMLElement} */ let _grid;
 
 /** HTML for the empty library state */
-const EMPTY_HTML = '<p style="text-align:center; color: rgba(255,255,255,.68); grid-column: 1 / -1;">Your library is empty. Start by downloading a video.</p>';
+const EMPTY_HTML = '<p class="library-empty">Your library is empty. Start by downloading a video.</p>';
 
 /** HTML for the error state */
-const ERROR_HTML = '<p style="text-align:center; grid-column: 1 / -1; color: rgba(251,113,133,.95);">Failed to load video library.</p>';
+const ERROR_HTML = '<p class="library-error">Failed to load video library.</p>';
 
 /** Render the video list into the grid container */
 function _renderVideos(videos) {
@@ -22,21 +22,42 @@ function _renderVideos(videos) {
     return;
   }
 
+  const fragment = document.createDocumentFragment();
   videos.forEach((video) => {
-    _grid.appendChild(createVideoCard(video));
+    fragment.appendChild(createVideoCard(video));
   });
+  _grid.appendChild(fragment);
 }
 
-/** Handle a VIDEO_DELETED event by animating out the card */
+/** Prepend a single new video card to the grid (no re-fetch needed) */
+function _prependVideo(state) {
+  const video = state.newVideo;
+  if (!video || !video.id) return;
+
+  // Don't add duplicate
+  if (document.getElementById(`video-card-${video.id}`)) return;
+
+  // Remove empty state message if present
+  const emptyMsg = _grid.querySelector('.library-empty');
+  if (emptyMsg) emptyMsg.remove();
+
+  const card = createVideoCard(video);
+  _grid.insertBefore(card, _grid.firstChild);
+
+  const newCount = _grid.querySelectorAll('.video-card').length;
+  setState('videos:updated', { completedCount: newCount });
+}
+
+/** Handle a VIDEO_DELETED event by removing the card */
 function _handleVideoDeleted(state) {
   const videoId = state.deletedVideoId;
   if (!videoId) return;
 
   const card = document.getElementById(`video-card-${videoId}`);
   if (card) {
-    card.style.transition = 'opacity 0.3s, transform 0.3s';
+    card.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
     card.style.opacity = '0';
-    card.style.transform = 'scale(0.9)';
+    card.style.transform = 'scale(0.95)';
 
     setTimeout(() => {
       card.remove();
@@ -44,10 +65,10 @@ function _handleVideoDeleted(state) {
       const newCount = Math.max(0, currentCount - 1);
       setState('videos:updated', { completedCount: newCount });
 
-      if (_grid.children.length === 0) {
+      if (_grid.querySelectorAll('.video-card').length === 0) {
         _grid.innerHTML = EMPTY_HTML;
       }
-    }, 300);
+    }, 250);
   }
 }
 
@@ -69,14 +90,12 @@ export async function refreshVideos() {
 export function initVideoLibrary() {
   _grid = $('video-list');
 
-  // When WebSocket signals a completed download, refresh the library
-  subscribe('videos:refresh', () => {
-    refreshVideos();
-  });
+  // When a new video is downloaded, prepend it directly (no re-fetch)
+  subscribe('video:prepend', _prependVideo);
 
-  // When a video is deleted via WebSocket broadcast (from another tab)
+  // When a video is deleted via WebSocket broadcast
   subscribe('video:deleted', _handleVideoDeleted);
 
-  // Initial load
+  // Initial load — only time we fetch the full list
   refreshVideos();
 }
