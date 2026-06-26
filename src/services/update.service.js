@@ -1,7 +1,7 @@
 const { exec } = require('child_process');
 const YTDlpWrap = require('yt-dlp-wrap').default;
 
-const ytdlp = new YTDlpWrap();
+const ytdlp = new YTDlpWrap('/opt/data/workspace/repos/medis/bin/yt-dlp');
 
 const checkForUpdates = async () => {
   console.log('[Updater] Running scheduled check for yt-dlp');

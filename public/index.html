@@ -4,15 +4,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#0b0f18">
-  <meta name="description" content="MEDIS - Media Embedding Delivery for Interactive Sharing">
+  <meta name="theme-color" content="#070a13">
+  <meta name="description" content="Self-hosted media platform powered by yt-dlp">
   <title>MEDIS | Media Downloader</title>
 
-  <link rel="icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" href="/favicon-real.png?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="/css/variables.css">
   <link rel="stylesheet" href="/css/base.css">
@@ -22,116 +22,180 @@
 </head>
 
 <body>
-  <header class="status-header">
-    <div class="status-container">
-      <div class="status-left">
-        <a href="/" class="brand-link">
-          <img src="/favicon.ico" alt="MEDIS" class="brand-logo">
-          <span class="brand-text">MEDIS</span>
-        </a>
+  <!-- Decorative background mesh/glow -->
+  <div class="bg-glow bg-glow-primary"></div>
+  <div class="bg-glow bg-glow-secondary"></div>
+  <div class="bg-grid-pattern"></div>
 
-        <div class="status-group">
-          <div class="status-badge">
-            <svg class="status-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3,15V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V15H19V19H5V15H3M12,14L17,9H14V3H10V9H7L12,14Z" />
-            </svg>
-            <span class="status-count" id="downloading-count">0</span>
-            <span class="status-label">Downloading</span>
-          </div>
-
-          <div class="status-badge">
-            <svg class="status-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z" />
-            </svg>
-            <span class="status-count" id="completed-count">0</span>
-            <span class="status-label">Completed</span>
-          </div>
+  <header class="app-header-modern">
+    <div class="header-content-modern">
+      <a href="/" class="brand-wrapper">
+        <div class="brand-logo-container">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="brand-logo-svg">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
         </div>
-      </div>
+        <span class="brand-name">MEDIS</span>
+      </a>
 
-      <div class="progress-container" id="progress-bar-container" style="display:none;">
-        <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-          <div class="progress-fill" id="progress-bar-inner"></div>
-          <div class="progress-text" id="progress-text">Preparing...</div>
+      <div class="header-stats-group">
+        <div class="stats-badge-modern badge-downloading">
+          <div class="badge-icon-wrapper active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="icon-downloading">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <polyline points="19 12 12 19 5 12"></polyline>
+            </svg>
+          </div>
+          <span class="stats-value" id="downloading-count">0</span>
+          <span class="stats-label">Downloading</span>
+        </div>
+
+        <div class="stats-badge-modern badge-saved">
+          <div class="badge-icon-wrapper completed">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="icon-saved">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <span class="stats-value" id="completed-count">0</span>
+          <span class="stats-label">Saved</span>
         </div>
       </div>
     </div>
   </header>
 
-  <main class="main-content">
-    <div class="content-wrapper">
-      <section class="hero-section">
-        <div class="hero-content">
-          <h1 class="hero-title">MEDIS</h1>
-          <p class="hero-kicker">Media Embedding Delivery for Interactive Sharing</p>
-          <p class="hero-desc">A seamless, platform-independent workflow to fetch, convert, and share videos from any URL</p>
+  <main class="main-layout-modern">
+    <div class="container-modern">
+      
+      <!-- Hero/Search Area -->
+      <section class="search-hero-section">
+        <div class="hero-text-center">
+          <h1 class="gradient-title">MEDIS</h1>
+          <p class="hero-subtitle">Media Embedding Delivery for Interactive Sharing</p>
+          
+          <!-- Key features badges (Ciri khas Medis) -->
+          <div class="hero-features-row">
+            <div class="feature-tag">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feature-icon">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              <span>Fast Fetch</span>
+            </div>
+            <div class="feature-tag-divider"></div>
+            <div class="feature-tag">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feature-icon">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+              </svg>
+              <span>Auto Mux</span>
+            </div>
+            <div class="feature-tag-divider"></div>
+            <div class="feature-tag">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feature-icon">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+              <span>Instant Share</span>
+            </div>
+          </div>
+          
+          <p class="hero-badge">Self-hosted media platform powered by yt-dlp</p>
         </div>
 
-        <div class="download-container">
-          <div class="input-shell">
-            <input class="url-input" id="video-url" type="url" inputmode="url"
-              placeholder="Paste a video link (YouTube, Instagram, TikTok, etc.)" autocomplete="off" spellcheck="false">
-            <button class="download-button" id="download-btn" type="button">
+        <div class="search-form-wrapper">
+          <div class="search-input-group">
+            <div class="input-icon-left">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+              </svg>
+            </div>
+            <input class="modern-url-input" id="video-url" type="url" inputmode="url"
+              placeholder="Paste a link (YouTube, Instagram, TikTok, Twitter...)" autocomplete="off" spellcheck="false">
+            <button class="modern-download-button" id="download-btn" type="button">
               <span>Download</span>
             </button>
           </div>
 
-          <div class="loading-state hidden" id="loading-indicator" aria-live="polite">
-            <div class="loading-spinner"></div>
-            <span>Submitting download request...</span>
+          <div class="loading-state-modern hidden" id="loading-indicator" aria-live="polite">
+            <div class="loading-spinner-ring"></div>
+            <span>Preparing stream payload...</span>
           </div>
         </div>
       </section>
 
-      <section class="library-section">
-        <div class="library-header">
-          <div class="library-heading">
-            <h2 class="library-title">Video Library</h2>
-            <div class="library-subtitle">Your downloaded content</div>
+      <!-- Active Downloads Progress Panel (Dynamic) -->
+      <section class="active-progress-section" id="progress-bar-container" style="display:none;">
+        <div class="progress-panel-card">
+          <div class="progress-panel-header">
+            <div class="progress-title-group">
+              <div class="spinner-inline-blue"></div>
+              <span class="progress-panel-title">Active Download Queue</span>
+            </div>
+            <span class="progress-percent-text" id="progress-text-percent">0%</span>
           </div>
+          <div class="progress-track-wrapper">
+            <div class="progress-fill-gradient" id="progress-bar-inner"></div>
+          </div>
+          <div class="progress-status-subtext" id="progress-text">Preparing...</div>
+        </div>
+      </section>
+
+      <!-- Library Grid -->
+      <section class="library-section-modern">
+        <div class="library-subheader">
+          <h2 class="library-section-title">Video Library</h2>
+          <div class="library-divider"></div>
         </div>
 
-        <div class="video-grid" id="video-list"></div>
+        <div class="modern-video-grid" id="video-list"></div>
       </section>
+
     </div>
   </main>
 
-  <footer class="main-footer">
-    <div class="footer-content">
-      <span class="footer-label">YT-DLP</span>
-      <span class="version-value" id="ytdlp-version">loading...</span>
-      <span class="footer-dot">•</span>
-      <span class="footer-label">MEDIS</span>
-      <span class="version-value" id="medis-version">loading...</span>
-      <span class="footer-dot">•</span>
-      <a href="https://github.com/raw-network/medis" target="_blank" rel="noopener noreferrer" class="github-link">
-        <svg class="github-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-          <path fill-rule="evenodd"
-            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z">
-          </path>
+  <footer class="app-footer-modern">
+    <div class="footer-container-modern">
+      <div class="footer-left-meta">
+        <span class="meta-pill">
+          <span class="meta-pill-dot"></span>
+          YT-DLP <span class="meta-version-val" id="ytdlp-version">loading...</span>
+        </span>
+        <span class="meta-pill">
+          <span class="meta-pill-dot"></span>
+          MEDIS <span class="meta-version-val" id="medis-version">loading...</span>
+        </span>
+      </div>
+      
+      <a href="https://github.com/raw-network/medis" target="_blank" rel="noopener noreferrer" class="github-link-modern">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="git-icon-svg">
+          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
         </svg>
-        <span>GitHub</span>
+        <span>Source</span>
       </a>
     </div>
   </footer>
 
-  <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
-
-  <div class="modal-overlay hidden" id="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title" id="modal-title">Confirm Deletion</h3>
+  <!-- Clean Modal overlay -->
+  <div class="modal-overlay-modern hidden" id="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card-modern">
+      <div class="modal-header-modern">
+        <h3 class="modal-title-modern" id="modal-title">Delete Video</h3>
       </div>
-      <div class="modal-body">
-        <p id="modal-text" class="modal-message">Are you sure you want to delete this video?</p>
+      <div class="modal-body-modern">
+        <p id="modal-text" class="modal-message-modern">Are you sure you want to delete this video?</p>
       </div>
-      <div class="modal-actions">
-        <button class="modal-button secondary" id="modal-cancel-btn" type="button">Cancel</button>
-        <button class="modal-button danger" id="modal-confirm-btn" type="button">Delete</button>
+      <div class="modal-actions-modern">
+        <button class="modal-btn-modern secondary" id="modal-cancel-btn" type="button">Cancel</button>
+        <button class="modal-btn-modern danger" id="modal-confirm-btn" type="button">Delete</button>
       </div>
     </div>
   </div>
+
+  <div class="toast-container-modern" id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
   <script type="module" src="/js/main.js"></script>
 </body>

@@ -11,6 +11,7 @@ import { getState, subscribe } from '../state/store.js';
 /** @type {HTMLElement} */ let _progressBar;
 /** @type {HTMLElement} */ let _progressFill;
 /** @type {HTMLElement} */ let _progressText;
+/** @type {HTMLElement} */ let _progressPercentText;
 
 /* ── Constants ── */
 const HIDE_GRACE_MS = 1200;
@@ -44,6 +45,7 @@ function _hideProgressUI() {
   _progressFill.style.width = '0%';
   if (_progressBar) _progressBar.setAttribute('aria-valuenow', '0');
   _progressText.textContent = 'Preparing...';
+  if (_progressPercentText) _progressPercentText.textContent = '0%';
   _p.visible = false;
   _p.lastPercent = null;
   _p.lastBase = '';
@@ -84,6 +86,7 @@ function _setProgress(percent, message) {
     _progressFill.style.width = '0%';
     if (_progressBar) _progressBar.setAttribute('aria-valuenow', '0');
     _progressText.textContent = base;
+    if (_progressPercentText) _progressPercentText.textContent = '0%';
     _p.lastAt = now;
     _p.lastPercent = null;
     _p.lastBase = base;
@@ -122,7 +125,8 @@ function _setProgress(percent, message) {
   _showProgressUI();
   _progressFill.style.width = `${p}%`;
   if (_progressBar) _progressBar.setAttribute('aria-valuenow', String(p));
-  _progressText.textContent = `${base} ${p}%`;
+  _progressText.textContent = base;
+  if (_progressPercentText) _progressPercentText.textContent = `${p}%`;
 }
 
 /* ── Public API ── */
@@ -135,9 +139,18 @@ export function initHeader() {
   _progressBar        = _progressContainer ? _progressContainer.querySelector('.progress-bar') : null;
   _progressFill       = $('progress-bar-inner');
   _progressText       = $('progress-text');
+  _progressPercentText = $('progress-text-percent');
 
   subscribe('status:updated', (state) => {
     _downloadingCountEl.textContent = state.downloadingCount;
+    const icon = document.querySelector('.icon-downloading');
+    if (icon) {
+      if (state.downloadingCount > 0) {
+        icon.classList.add('spin-active');
+      } else {
+        icon.classList.remove('spin-active');
+      }
+    }
   });
 
   subscribe('videos:updated', (state) => {

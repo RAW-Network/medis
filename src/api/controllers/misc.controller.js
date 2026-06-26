@@ -2,7 +2,17 @@ const YTDlpWrap = require('yt-dlp-wrap').default;
 const cache = require('../../utils/cache');
 const videoService = require('../../services/video.service');
 const CustomError = require('../../utils/CustomError');
-const ytdlp = new YTDlpWrap();
+const ytdlp = new YTDlpWrap('/opt/data/workspace/repos/medis/bin/yt-dlp');
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
 const VERSION_CACHE_KEY = 'versionInfo';
 const CACHE_TTL = 3600 * 1000;
@@ -46,6 +56,7 @@ exports.getSharePage = (req, res, next) => {
     
     const videoWidth = video.width || 1280;
     const videoHeight = video.height || 720;
+    const safeTitle = escapeHtml(video.title);
 
     const html = `
     <!DOCTYPE html>
@@ -53,15 +64,15 @@ exports.getSharePage = (req, res, next) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${video.title}</title>
+        <title>${safeTitle}</title>
         <meta name="twitter:card" content="player">
-        <meta name="twitter:title" content="${video.title}">
+        <meta name="twitter:title" content="${safeTitle}">
         <meta name="twitter:player" content="${videoUrl}">
         <meta name="twitter:player:width" content="${videoWidth}">
         <meta name="twitter:player:height" content="${videoHeight}">
         <meta name="twitter:image" content="${thumbnailUrl}">
         <meta property="og:type" content="video.other">
-        <meta property="og:title" content="${video.title}">
+        <meta property="og:title" content="${safeTitle}">
         <meta property="og:url" content="${shareUrl}">
         <meta property="og:image" content="${thumbnailUrl}">
         <meta property="og:video" content="${videoUrl}">

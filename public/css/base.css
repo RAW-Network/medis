@@ -1,37 +1,103 @@
-/* base.css - Base reset and global styles */
+/* public/css/base.css */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-@import url('./variables.css');
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: var(--font);
+html, body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
   overflow-x: hidden;
-  color: var(--text);
-  background:
-    radial-gradient(ellipse 900px 500px at 10% 0%, rgba(79, 140, 255, .10), transparent 60%),
-    radial-gradient(ellipse 900px 500px at 90% 0%, rgba(134, 183, 255, .06), transparent 55%),
-    linear-gradient(180deg, var(--bg0), var(--bg1) 50%, var(--bg2));
+  position: relative;
 }
 
-/* Utility */
-.hidden { display: none !important; }
-
-/* Focus ring */
-:focus-visible {
-  outline: 2px solid rgba(79, 140, 255, .50);
-  outline-offset: 2px;
+/* Background Mesh / Glow Effects */
+.bg-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(140px);
+  z-index: -2;
+  opacity: 0.15;
+  pointer-events: none;
 }
 
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+.bg-glow-primary {
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, var(--color-primary-soft), transparent 70%);
+  top: -10vw;
+  right: -5vw;
+}
+
+.bg-glow-secondary {
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, var(--color-accent), transparent 70%);
+  bottom: -20vw;
+  left: -10vw;
+}
+
+.bg-grid-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: center top;
+  mask-image: radial-gradient(ellipse at 50% 50%, black, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black, transparent 80%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Typography Selection */
+::selection {
+  background: var(--color-primary-glow);
+  color: var(--color-primary-soft);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+button, input {
+  font-family: inherit;
+  font-size: inherit;
+  border: none;
+  background: none;
+  outline: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
 }

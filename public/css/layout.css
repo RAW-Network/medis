@@ -1,230 +1,135 @@
-/* layout.css - Structural positioning */
-
-/* ── Sticky Header ── */
-.status-header {
+/* public/css/layout.css */
+.app-header-modern {
   position: sticky;
   top: 0;
-  z-index: 1000;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  background: rgba(7, 10, 16, .72);
-  border-bottom: 1px solid var(--stroke);
-}
-
-.status-container {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 10px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-}
-
-.status-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-
-/* ── Brand ── */
-.brand-link {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  padding: 6px 8px;
-  border-radius: var(--radius);
-  border: 1px solid transparent;
-  transition: background var(--t), border-color var(--t);
-}
-
-.brand-link:hover {
-  background: var(--panel2);
-  border-color: var(--stroke);
-}
-
-.brand-logo {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-}
-
-.brand-text {
-  font-family: var(--font-brand);
-  font-size: 1.1rem;
-  font-weight: 800;
-  letter-spacing: .2px;
-  color: var(--text);
-}
-
-/* ── Main Content ── */
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.content-wrapper {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 0 20px;
+  height: var(--header-height);
   width: 100%;
-}
-
-/* ── Hero Section ── */
-.hero-section {
-  padding: 44px 0 16px;
-  text-align: center;
-}
-
-.hero-content {
-  max-width: 680px;
-  margin: 0 auto 20px;
-}
-
-.hero-title {
-  font-family: var(--font-brand);
-  font-size: clamp(2.4rem, 6vw, 3.8rem);
-  font-weight: 900;
-  margin: 0 0 8px;
-  letter-spacing: -0.02em;
-  color: var(--accent);
-}
-
-.hero-kicker {
-  margin: 0 0 12px;
-  color: var(--text2);
-  font-weight: 500;
-  font-size: .95rem;
-}
-
-.hero-desc {
-  margin: 0;
-  color: var(--text3);
-  font-size: .92rem;
-  line-height: 1.7;
-}
-
-/* ── Library Section ── */
-.library-section {
-  padding: 20px 0 32px;
-  margin-top: 16px;
-  border-top: 1px solid var(--stroke);
-}
-
-.library-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-}
-
-.library-title {
-  font-family: var(--font-brand);
-  font-size: 1.45rem;
-  font-weight: 800;
-  margin: 0;
-}
-
-.library-subtitle {
-  color: var(--text3);
-  font-size: .88rem;
-  margin-top: 2px;
-}
-
-/* ── Footer ── */
-.main-footer {
-  margin-top: auto;
-  padding: 10px 20px;
-  border-top: 1px solid var(--stroke);
-  background: rgba(7, 10, 16, .60);
+  background: rgba(6, 9, 19, 0.65);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  z-index: 100;
+  display: flex;
+  align-items: center;
 }
 
-.footer-content {
-  max-width: 1440px;
+.header-content-modern {
+  width: 100%;
+  max-width: var(--max-width);
   margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo-container {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  color: var(--text3);
-  font-size: .82rem;
+  color: var(--text-main);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
 }
 
-.footer-label {
-  font-weight: 700;
-  color: var(--text2);
+.brand-logo-svg {
+  width: 20px;
+  height: 20px;
 }
 
-.version-value {
-  background: var(--panel2);
-  padding: 4px 10px;
-  border-radius: var(--radius-pill);
-  font-weight: 700;
-  color: var(--text);
-  font-family: var(--font-brand);
-  font-size: .8rem;
-  border: 1px solid var(--stroke);
+.brand-name {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.3rem;
+  letter-spacing: -0.5px;
+  background: linear-gradient(to right, var(--text-main), #cbd5e1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.footer-dot {
-  opacity: .35;
-  margin: 0 2px;
+.main-layout-modern {
+  width: 100%;
+  padding: 40px 24px 80px 24px;
 }
 
-.github-link {
+.container-modern {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* Modern Library Grid */
+.library-section-modern {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.library-subheader {
   display: flex;
   align-items: center;
-  gap: 6px;
-  color: var(--text3);
-  text-decoration: none;
-  font-weight: 600;
-  transition: color var(--t);
-  padding: 4px 8px;
-  border-radius: var(--radius-pill);
+  gap: 20px;
 }
 
-.github-link:hover {
-  color: var(--text);
+.library-section-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: -0.5px;
+  color: var(--text-main);
+  white-space: nowrap;
 }
 
-.github-icon {
-  width: 14px;
-  height: 14px;
-  fill: currentColor;
+.library-divider {
+  flex-grow: 1;
+  height: 1px;
+  background: var(--border-color);
 }
 
-/* ── Responsive: Header ── */
-@media (max-width: 900px) {
-  .progress-container { max-width: 480px; }
+.modern-video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
 }
 
-@media (max-width: 520px) {
-  .status-container {
-    flex-wrap: wrap;
-    padding: 8px 14px;
+/* Footer layout */
+.app-footer-modern {
+  border-top: 1px solid var(--border-color);
+  background: rgba(6, 9, 19, 0.4);
+  padding: 24px 0;
+  width: 100%;
+}
+
+.footer-container-modern {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .header-content-modern, .footer-container-modern {
+    padding: 0 16px;
   }
-
-  .status-left {
-    width: 100%;
-    justify-content: space-between;
+  .main-layout-modern {
+    padding: 24px 16px 60px 16px;
   }
-
-  .progress-container {
-    width: 100%;
-    max-width: 100%;
-    order: 3;
+  .modern-video-grid {
+    grid-template-columns: 1fr;
   }
-
-  .progress-bar { height: 32px; }
-
-  .hero-section { padding: 32px 0 12px; }
-  .content-wrapper { padding: 0 14px; }
 }

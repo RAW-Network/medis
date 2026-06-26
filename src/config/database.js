@@ -23,6 +23,15 @@ const createTableQuery = `
     height INTEGER
   );
   CREATE INDEX IF NOT EXISTS idx_videos_createdAt ON videos (createdAt);
+
+  CREATE TABLE IF NOT EXISTS download_queue (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    url TEXT NOT NULL,
+    jobId TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    createdAt TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_download_queue_status ON download_queue (status);
 `;
 
 db.exec(createTableQuery);

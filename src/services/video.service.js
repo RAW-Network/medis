@@ -54,7 +54,6 @@ exports.deleteVideoById = (id) => {
 
   try {
     executeDelete();
-    websocketService.broadcast({ type: 'videoDeleted', videoId: id });
     websocketService.broadcast({
         type: 'VIDEO_DELETED', 
         payload: { id }

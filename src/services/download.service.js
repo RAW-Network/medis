@@ -14,7 +14,8 @@ exports.processUrl = async (url) => {
   if (isPlaylistUrl(url)) {
     console.log('[Queue] Playlist detected. Processing playlist URL');
     try {
-      const videoInfos = await ytdlpService.getPlaylistItems(url, config.playlistDownloadLimit);
+      const cookiesFilePath = path.join(config.cookiesPath, 'cookies.txt');
+      const videoInfos = await ytdlpService.getPlaylistItems(url, config.playlistDownloadLimit, cookiesFilePath);
 
       if (videoInfos.length === 0) {
         throw new CustomError('Could not find any videos in the provided playlist', 404);

@@ -1,11 +1,14 @@
 const YTDlpWrap = require('yt-dlp-wrap').default;
 const fs = require('fs');
 
-const ytdlp = new YTDlpWrap();
+const ytdlp = new YTDlpWrap('/opt/data/workspace/repos/medis/bin/yt-dlp');
 
-exports.getPlaylistItems = async (url, limit) => {
+exports.getPlaylistItems = async (url, limit, cookiesPath) => {
   const args = [url, '--flat-playlist', '--dump-json'];
   if (limit) args.push('--playlist-end', String(limit));
+  if (cookiesPath && fs.existsSync(cookiesPath)) {
+    args.push('--cookies', cookiesPath);
+  }
 
   const stdout = await ytdlp.execPromise(args);
   return stdout.trim().split('\n').filter(line => line).map(line => JSON.parse(line));

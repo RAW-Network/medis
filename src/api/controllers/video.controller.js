@@ -1,6 +1,5 @@
 const videoService = require('../../services/video.service');
 const downloadService = require('../../services/download.service');
-const wsService = require('../../services/websocket.service');
 const { isValidUrl } = require('../../utils/security');
 const CustomError = require('../../utils/CustomError');
 const fs = require('fs');
@@ -39,11 +38,6 @@ exports.deleteVideo = (req, res, next) => {
   try {
     const { id } = req.params;
     videoService.deleteVideoById(id);
-    
-    wsService.broadcast({
-      type: 'VIDEO_DELETED',
-      payload: { id }
-    });
 
     res.status(200).json({ message: 'Video deleted successfully' });
   } catch (error) {
