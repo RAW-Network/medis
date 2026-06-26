@@ -2,7 +2,9 @@ const YTDlpWrap = require('yt-dlp-wrap').default;
 const cache = require('../../utils/cache');
 const videoService = require('../../services/video.service');
 const CustomError = require('../../utils/CustomError');
-const ytdlp = new YTDlpWrap('/opt/data/workspace/repos/medis/bin/yt-dlp');
+const config = require('../../config');
+
+const ytdlp = new YTDlpWrap(config.ytdlpPath);
 
 function escapeHtml(str) {
   if (!str) return '';

@@ -16,6 +16,7 @@ const config = {
   maxQueueLimit: parsePositiveIntOrNull(process.env.MAX_QUEUE_LIMIT),
   playlistDownloadLimit: parsePositiveIntOrNull(process.env.PLAYLIST_DOWNLOAD_LIMIT),
   autoUpdateYtdlp: process.env.AUTO_UPDATE_YTDLP === 'true',
+  ytdlpPath: process.env.YTDLP_PATH || 'yt-dlp',
   storagePath: baseDataPath,
   dbPath: path.join(baseDataPath, 'medis.db'),
   videosPath: path.join(baseDataPath, 'videos'),

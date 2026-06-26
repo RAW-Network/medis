@@ -1,7 +1,8 @@
 const YTDlpWrap = require('yt-dlp-wrap').default;
 const fs = require('fs');
+const config = require('../config');
 
-const ytdlp = new YTDlpWrap('/opt/data/workspace/repos/medis/bin/yt-dlp');
+const ytdlp = new YTDlpWrap(config.ytdlpPath);
 
 exports.getPlaylistItems = async (url, limit, cookiesPath) => {
   const args = [url, '--flat-playlist', '--dump-json'];
