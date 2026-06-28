@@ -1,3 +1,4 @@
+/** Simple in-memory cache utility with TTL support */
 const cache = new Map();
 
 function set(key, value, ttl) {

@@ -1,3 +1,4 @@
+/** Data access layer for video records in the database */
 const db = require('../config/database');
 
 exports.findById = (id) => {

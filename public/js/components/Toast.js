@@ -1,5 +1,4 @@
-// components/Toast.js - Toast notification system
-
+/** Toast notification component for displaying temporary success or error messages */
 import { $ } from '../utils/dom.js';
 import { ICONS } from '../utils/icons.js';
 
@@ -32,13 +31,7 @@ export function showToast(message, type = 'info', duration = 4000) {
   toast.innerHTML = `
     <div class="toast-icon">${ICON_MAP[type] || ICONS.info}</div>
     <div class="toast-content">${message}</div>
-    <button class="toast-close" type="button" aria-label="Close">
-      ${ICONS.close}
-    </button>
   `;
-
-  const closeBtn = toast.querySelector('.toast-close');
-  closeBtn.addEventListener('click', () => _removeToast(toast));
 
   _container.appendChild(toast);
   requestAnimationFrame(() => toast.classList.add('show'));

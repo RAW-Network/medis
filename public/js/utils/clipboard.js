@@ -1,5 +1,4 @@
-// utils/clipboard.js - Cross-browser clipboard write utility
-
+/** Clipboard utilities for copying text to the browser clipboard */
 /**
  * Copy text to the clipboard. Uses the modern Clipboard API when available,
  * falls back to the legacy execCommand approach.

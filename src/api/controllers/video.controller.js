@@ -1,3 +1,4 @@
+/** Controller for handling video-related operations like download, list, and delete */
 const videoService = require('../../services/video.service');
 const downloadService = require('../../services/download.service');
 const { isValidUrl } = require('../../utils/security');

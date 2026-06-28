@@ -1,21 +1,21 @@
-/* public/css/variables.css */
+/* CSS variables definition for global color themes and sizing */
 :root {
-  /* Color Palette - Premium Softer Dark Theme */
-  --bg-main: #060913;
-  --bg-surface: #0b1120;
-  --bg-card: rgba(15, 23, 42, 0.45);
-  --bg-card-hover: rgba(30, 41, 59, 0.55);
+  /* Color Palette - Modern Clean Dark Theme */
+  --bg-main: #030712;
+  --bg-surface: #0f172a;
+  --bg-card: rgba(15, 23, 42, 0.5);
+  --bg-card-hover: rgba(30, 41, 59, 0.7);
   
   /* Primary Soft Blue Accent */
-  --color-primary: #3b82f6;
-  --color-primary-soft: #60a5fa;
-  --color-primary-glow: rgba(59, 130, 246, 0.15);
-  --color-primary-dark: #1d4ed8;
+  --color-primary: #38bdf8;
+  --color-primary-soft: #7dd3fc;
+  --color-primary-glow: rgba(56, 189, 248, 0.1);
+  --color-primary-dark: #0284c7;
   
   /* Accent Colors */
-  --color-accent: #06b6d4;
-  --color-accent-soft: #22d3ee;
-  --color-accent-glow: rgba(6, 182, 212, 0.12);
+  --color-accent: #818cf8;
+  --color-accent-soft: #a5b4fc;
+  --color-accent-glow: rgba(129, 140, 248, 0.1);
 
   /* Status Colors */
   --color-success: #10b981;
@@ -44,10 +44,12 @@
   --font-body: 'Inter', system-ui, -apple-system, sans-serif;
   
   /* Layout */
-  --max-width: 1100px;
+  --max-width: 1300px;
   --header-height: 76px;
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 20px;
-  --transition-smooth: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Clean Snappy Transitions */
+  --transition-smooth: all 0.2s cubic-bezier(0.2, 0, 0, 1);
 }

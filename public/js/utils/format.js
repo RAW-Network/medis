@@ -1,5 +1,4 @@
-// utils/format.js - Text formatting utilities for progress messages
-
+/** Format utilities for formatting strings, times, and numbers */
 /** Collapse non-breaking spaces and multiple whitespace into single spaces */
 export function normalizeSpaces(s) {
   return String(s || '').replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();

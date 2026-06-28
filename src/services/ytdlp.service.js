@@ -1,3 +1,4 @@
+/** Service wrapper for yt-dlp operations like fetching playlists */
 const YTDlpWrap = require('yt-dlp-wrap').default;
 const fs = require('fs');
 const config = require('../config');

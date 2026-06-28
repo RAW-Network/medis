@@ -1,3 +1,4 @@
+/** Service for handling automatic updates of yt-dlp */
 const { exec } = require('child_process');
 const YTDlpWrap = require('yt-dlp-wrap').default;
 const config = require('../config');

@@ -1,3 +1,4 @@
+/** Express router for miscellaneous endpoints */
 const express = require('express');
 const { getVersion, getSharePage } = require('../controllers/misc.controller');
 const { validateId } = require('../middlewares/validator');

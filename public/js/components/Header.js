@@ -1,5 +1,4 @@
-// components/Header.js - Manages status badges and progress bar
-
+/** Header component for displaying statistics and active download progress */
 import { $ } from '../utils/dom.js';
 import { normalizeSpaces, stripAllPercents } from '../utils/format.js';
 import { getState, subscribe } from '../state/store.js';
@@ -14,10 +13,10 @@ import { getState, subscribe } from '../state/store.js';
 /** @type {HTMLElement} */ let _progressPercentText;
 
 /* ── Constants ── */
-const HIDE_GRACE_MS = 1200;
-const HIDE_AFTER_MS = 600;
-const THROTTLE_MS = 100;
-const REGRESS_THRESHOLD = 10;
+const HIDE_GRACE_MS = 1500;
+const HIDE_AFTER_MS = 800;
+const THROTTLE_MS = 150;
+const REGRESS_THRESHOLD = 8;
 
 /* ── Internal State ── */
 const _p = {
@@ -131,7 +130,7 @@ function _setProgress(percent, message) {
 
 /* ── Public API ── */
 
-/** Initialise the Header component */
+/** Initialise header DOM references and state subscriptions */
 export function initHeader() {
   _downloadingCountEl = $('downloading-count');
   _completedCountEl   = $('completed-count');

@@ -1,12 +1,11 @@
-// components/Footer.js - Fetches and displays version info
-
+/** Footer component for displaying application version and metadata */
 import { $ } from '../utils/dom.js';
 import { fetchVersion } from '../api/client.js';
 
 /** localStorage key for cached version data */
 const CACHE_KEY = 'medis_versions';
 
-/** Initialise the footer component */
+/** Initialise the footer and trigger version fetch */
 export function initFooter() {
   const ytdlpEl = $('ytdlp-version');
   const medisEl = $('medis-version');

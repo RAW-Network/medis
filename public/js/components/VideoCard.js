@@ -1,5 +1,4 @@
-// components/VideoCard.js - Factory function for video card DOM elements
-
+/** Component for creating video card elements to be displayed in the gallery */
 import { el } from '../utils/dom.js';
 import { ICONS } from '../utils/icons.js';
 import { copyToClipboard } from '../utils/clipboard.js';
@@ -7,26 +6,51 @@ import { showToast } from './Toast.js';
 import { showConfirmModal } from './Modal.js';
 import { deleteVideo } from '../api/client.js';
 
-/** Replace a thumbnail placeholder with an inline video player */
+/** Open a video in a modal player */
 function _playVideo(event) {
   const placeholder = /** @type {HTMLElement} */ (event.currentTarget);
   const videoSrc = placeholder.dataset.src;
   if (!videoSrc) return;
 
-  const player = el('video', {
-    className: 'card-video-player',
-    attrs: { src: videoSrc, controls: '', autoplay: '', preload: 'auto' }
-  });
+  event.stopPropagation();
 
-  // Remove action buttons overlay when playing video
-  const card = placeholder.closest('.video-card');
-  if (card) {
-    const overlays = card.querySelectorAll('.card-actions-overlay, .card-badges-overlay');
-    overlays.forEach(o => o.remove());
-  }
+  const modal = document.getElementById('video-player-modal');
+  const videoPlayer = document.getElementById('video-modal-player');
+  const closeBtn = document.getElementById('video-modal-close');
 
-  placeholder.parentNode.replaceChild(player, placeholder);
-  player.focus();
+  if (!modal || !videoPlayer) return;
+
+  videoPlayer.src = videoSrc;
+  modal.classList.remove('hidden');
+  requestAnimationFrame(() => modal.classList.add('visible'));
+  
+  // Prevent scrolling behind modal on mobile
+  document.body.style.overflow = 'hidden';
+
+  const closeModal = () => {
+    videoPlayer.pause();
+    videoPlayer.src = '';
+    document.body.style.overflow = '';
+    modal.classList.remove('visible');
+    setTimeout(() => {
+      modal.classList.add('hidden');
+    }, 220);
+    closeBtn.removeEventListener('click', closeModal);
+    modal.removeEventListener('click', onOverlayClick);
+    document.removeEventListener('keydown', onEsc);
+  };
+
+  const onEsc = (e) => {
+    if (e.key === 'Escape') closeModal();
+  };
+
+  const onOverlayClick = (e) => {
+    if (e.target === modal) closeModal();
+  };
+
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', onOverlayClick);
+  document.addEventListener('keydown', onEsc);
 }
 
 /** Get resolution label from width and height */
@@ -78,13 +102,7 @@ export function createVideoCard(video) {
     badgesContainer.appendChild(resBadge);
   }
 
-  // Floating Actions overlay (bottom right of thumbnail - visible on hover)
-  const actionsOverlay = el('div', { className: 'card-actions-overlay' });
-  const copyBtn = _createCopyButton(video);
-  const deleteBtn = _createDeleteButton(video, card);
-  actionsOverlay.append(copyBtn, deleteBtn);
-
-  thumbWrapper.append(placeholder, badgesContainer, actionsOverlay);
+  thumbWrapper.append(placeholder, badgesContainer);
 
   // ── Info section (Ultra-clean typography) ──
   const info = el('div', { className: 'card-info-modern' });
@@ -99,7 +117,13 @@ export function createVideoCard(video) {
     : '';
     
   metaRow.append(date);
-  info.append(title, metaRow);
+
+  const actionsRow = el('div', { className: 'card-actions-row' });
+  const copyBtn = _createCopyButton(video);
+  const deleteBtn = _createDeleteButton(video, card);
+  actionsRow.append(copyBtn, deleteBtn);
+
+  info.append(title, metaRow, actionsRow);
   
   card.append(thumbWrapper, info);
 
@@ -109,8 +133,8 @@ export function createVideoCard(video) {
 /** Create the minimal "Copy" share-link button */
 function _createCopyButton(video) {
   const btn = /** @type {HTMLButtonElement} */ (el('button', {
-    className: 'btn-action-overlay btn-copy-overlay',
-    html: ICONS.copy,
+    className: 'btn-action-clean btn-copy-clean',
+    html: ICONS.copy + ' <span>Share</span>',
     attrs: { title: 'Copy Share Link', type: 'button' }
   }));
 
@@ -123,10 +147,10 @@ function _createCopyButton(video) {
       if (!copied) throw new Error('copy failed');
       btn.disabled = true;
       btn.classList.add('copied');
-      btn.innerHTML = ICONS.copied;
+      btn.innerHTML = ICONS.copied + ' <span>Copied!</span>';
       showToast('Share link copied to clipboard', 'success');
       setTimeout(() => {
-        btn.innerHTML = ICONS.copy;
+        btn.innerHTML = ICONS.copy + ' <span>Share</span>';
         btn.classList.remove('copied');
         btn.disabled = false;
       }, 2000);
@@ -141,8 +165,8 @@ function _createCopyButton(video) {
 /** Create the minimal "Delete" button */
 function _createDeleteButton(video, card) {
   const btn = /** @type {HTMLButtonElement} */ (el('button', {
-    className: 'btn-action-overlay btn-delete-overlay',
-    html: ICONS.trash,
+    className: 'btn-action-clean btn-delete-clean',
+    html: ICONS.trash + ' <span>Delete</span>',
     attrs: { title: 'Delete Video', type: 'button' }
   }));
 
@@ -160,7 +184,7 @@ function _createDeleteButton(video, card) {
     } catch (error) {
       showToast(error.message || 'Failed to delete video', 'error');
       btn.disabled = false;
-      btn.innerHTML = ICONS.trash;
+      btn.innerHTML = ICONS.trash + ' <span>Delete</span>';
     }
   });
 

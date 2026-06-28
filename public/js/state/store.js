@@ -1,5 +1,4 @@
-// state/store.js - Centralized application state with event-based subscription
-
+/** Global application state store using a simple pub/sub model */
 const _listeners = {};
 
 const _state = {

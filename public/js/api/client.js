@@ -1,11 +1,10 @@
-// api/client.js - Centralized HTTP client for all backend API interactions
-
+/** API client for handling all HTTP requests to the backend */
 const API_URL = '/api';
 
 /** In-flight request tracker for deduplication */
 let _videosRequest = null;
 
-/** Fetch the list of all downloaded videos (deduplicated) */
+/** Fetch all available videos from the library */
 export async function fetchVideos() {
   if (_videosRequest) return _videosRequest;
 
@@ -31,8 +30,8 @@ async function _fetchVideosInternal() {
   }
 }
 
-/** Submit a URL for download */
-export async function requestDownload(url) {
+/** Post a URL to the download queue */
+export async function triggerDownload(url) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30000);
 
@@ -53,7 +52,7 @@ export async function requestDownload(url) {
   }
 }
 
-/** Delete a video by its ID */
+/** Send a delete request for a specific video */
 export async function deleteVideo(id) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
@@ -73,7 +72,7 @@ export async function deleteVideo(id) {
   }
 }
 
-/** Fetch yt-dlp and MEDIS version info */
+/** Fetch yt-dlp and MEDIS backend version info */
 export async function fetchVersion() {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);

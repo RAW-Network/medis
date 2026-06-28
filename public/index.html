@@ -1,3 +1,4 @@
+<!-- Main HTML file for the MEDIS application interface -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,7 +9,7 @@
   <meta name="description" content="Self-hosted media platform powered by yt-dlp">
   <title>MEDIS | Media Downloader</title>
 
-  <link rel="icon" type="image/png" href="/favicon-real.png?v=3">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -29,16 +30,12 @@
 
   <header class="app-header-modern">
     <div class="header-content-modern">
-      <a href="/" class="brand-wrapper">
+      <button id="brand-btn" class="brand-wrapper" type="button" title="Go to home">
         <div class="brand-logo-container">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="brand-logo-svg">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
+          <img src="/favicon.ico" alt="MEDIS" class="brand-logo-img">
         </div>
         <span class="brand-name">MEDIS</span>
-      </a>
+      </button>
 
       <div class="header-stats-group">
         <div class="stats-badge-modern badge-downloading">
@@ -174,10 +171,23 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="git-icon-svg">
           <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
         </svg>
-        <span>Source</span>
+        <span class="github-link-text">Source</span>
       </a>
     </div>
   </footer>
+
+  <!-- Video Player Modal -->
+  <div class="modal-overlay-modern hidden" id="video-player-modal" role="dialog" aria-modal="true">
+    <div class="video-modal-card-modern">
+      <button class="video-modal-close-btn" id="video-modal-close" type="button" title="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <video id="video-modal-player" class="video-modal-player" controls autoplay></video>
+    </div>
+  </div>
 
   <!-- Clean Modal overlay -->
   <div class="modal-overlay-modern hidden" id="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">

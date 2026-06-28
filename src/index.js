@@ -1,3 +1,4 @@
+/** Application entry point that initializes the HTTP server and WebSocket */
 const http = require('http');
 const { WebSocketServer } = require('ws');
 const app = require('./app');

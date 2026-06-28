@@ -1,3 +1,4 @@
+/** Express router for video-related endpoints */
 const express = require('express');
 const { downloadVideo, getVideos, deleteVideo, streamVideo } = require('../controllers/video.controller');
 const { validateId } = require('../middlewares/validator');

@@ -1,3 +1,4 @@
+/** Security utilities for validating URLs and UUIDs */
 const { URL } = require('url');
 
 exports.isValidUrl = (urlString) => {

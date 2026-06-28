@@ -1,3 +1,4 @@
+/** Service for broadcasting real-time updates to connected clients */
 const videoService = require('./video.service');
 
 let wssInstance = null;

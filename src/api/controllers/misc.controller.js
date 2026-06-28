@@ -1,3 +1,4 @@
+/** Controller for handling miscellaneous routes like version info and share pages */
 const YTDlpWrap = require('yt-dlp-wrap').default;
 const cache = require('../../utils/cache');
 const videoService = require('../../services/video.service');

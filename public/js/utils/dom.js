@@ -1,5 +1,4 @@
-// utils/dom.js - DOM helper utilities
-
+/** DOM utilities to simplify HTML element manipulation and creation */
 /** Shorthand for document.getElementById */
 export function $(id) {
   return document.getElementById(id);

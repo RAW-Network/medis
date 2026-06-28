@@ -1,3 +1,4 @@
+/** Service for managing the video download process and lifecycle */
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');

@@ -1,6 +1,5 @@
-// services/websocket.js - WebSocket client with exponential backoff reconnect
-
-import { getState, setState } from '../state/store.js';
+/** WebSocket service for real-time bi-directional communication with the backend */
+import { setState } from '../state/store.js';
 import { showToast } from '../components/Toast.js';
 
 let _socket = null;

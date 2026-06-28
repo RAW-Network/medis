@@ -1,4 +1,4 @@
-/* public/css/base.css */
+/* Base styles and CSS reset for the entire page */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -6,7 +6,7 @@
 }
 
 html, body {
-  background-color: var(--bg-main);
+  background: linear-gradient(to bottom right, #050b14, #0a1128, #030712);
   color: var(--text-main);
   font-family: var(--font-body);
   font-size: 16px;
@@ -15,33 +15,20 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
   overflow-x: hidden;
-  position: relative;
+  overflow-y: scroll;
 }
 
-/* Background Mesh / Glow Effects */
+/* Subtle mesh background */
 .bg-glow {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(140px);
-  z-index: -2;
-  opacity: 0.15;
-  pointer-events: none;
+  display: none;
 }
 
 .bg-glow-primary {
-  width: 50vw;
-  height: 50vw;
-  background: radial-gradient(circle, var(--color-primary-soft), transparent 70%);
-  top: -10vw;
-  right: -5vw;
+  display: none;
 }
 
 .bg-glow-secondary {
-  width: 60vw;
-  height: 60vw;
-  background: radial-gradient(circle, var(--color-accent), transparent 70%);
-  bottom: -20vw;
-  left: -10vw;
+  display: none;
 }
 
 .bg-grid-pattern {

@@ -1,3 +1,4 @@
+/** Centralized configuration module loading environment variables */
 const path = require('path');
 require('dotenv').config({ quiet: true });
 

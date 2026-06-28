@@ -1,3 +1,4 @@
+/** Service for downloading and managing video thumbnails */
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');

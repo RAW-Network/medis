@@ -1,5 +1,4 @@
-// components/VideoLibrary.js - Manages the video grid and fetching
-
+/** Video library component for fetching and rendering the list of videos */
 import { $ } from '../utils/dom.js';
 import { fetchVideos } from '../api/client.js';
 import { setState, getState, subscribe } from '../state/store.js';
@@ -86,7 +85,7 @@ export async function refreshVideos() {
   }
 }
 
-/** Initialise the VideoLibrary component */
+/** Initialise library DOM references and initial fetch */
 export function initVideoLibrary() {
   _grid = $('video-list');
 

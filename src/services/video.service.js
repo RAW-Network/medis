@@ -1,3 +1,4 @@
+/** Service for managing video metadata and file operations */
 const path = require('path');
 const fs = require('fs');
 const config = require('../config');

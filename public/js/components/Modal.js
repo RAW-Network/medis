@@ -1,5 +1,4 @@
-// components/Modal.js - Confirmation modal dialog
-
+/** Modal component for displaying confirmation dialogs to the user */
 import { $ } from '../utils/dom.js';
 import { ICONS } from '../utils/icons.js';
 
@@ -32,9 +31,13 @@ export function showConfirmModal(videoTitle) {
 
     _overlay.classList.remove('hidden');
     requestAnimationFrame(() => _overlay.classList.add('visible'));
+    
+    // Prevent background scrolling
+    document.body.style.overflow = 'hidden';
 
     const close = (ok) => {
       _overlay.classList.remove('visible');
+      document.body.style.overflow = '';
       setTimeout(() => {
         _overlay.classList.add('hidden');
         resolve(ok);

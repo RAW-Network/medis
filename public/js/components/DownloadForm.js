@@ -1,7 +1,6 @@
-// components/DownloadForm.js - Handles URL input field and download button
-
+/** Form component for handling input and submission of new download requests */
 import { $ } from '../utils/dom.js';
-import { requestDownload } from '../api/client.js';
+import { triggerDownload } from '../api/client.js';
 import { showToast } from './Toast.js';
 
 /** @type {HTMLInputElement} */ let _input;
@@ -24,7 +23,7 @@ async function _handleDownload() {
   _loading.classList.remove('hidden');
 
   try {
-    const result = await requestDownload(url);
+    const result = await triggerDownload(url);
     showToast(result.message || 'Queued', 'info');
     _input.value = '';
     _startCooldown();
@@ -58,7 +57,7 @@ function _startCooldown() {
   }, 1000);
 }
 
-/** Initialise the download form component */
+/** Initialise the form by binding DOM elements and events */
 export function initDownloadForm() {
   _input   = /** @type {HTMLInputElement} */ ($('video-url'));
   _btn     = /** @type {HTMLButtonElement} */ ($('download-btn'));

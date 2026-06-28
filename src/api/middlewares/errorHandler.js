@@ -1,3 +1,4 @@
+/** Global error handling middleware for Express routes */
 function errorHandler(err, req, res, next) {
   console.error('[Global Error Handler]:', err);
   const statusCode = err.statusCode || 500;

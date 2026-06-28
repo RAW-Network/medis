@@ -1,3 +1,4 @@
+/** Service for managing the download queue in the database */
 const db = require('../config/database');
 
 // Prepared statements for performance

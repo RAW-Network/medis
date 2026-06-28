@@ -1,3 +1,4 @@
+/** Middleware for validating request parameters and payloads */
 const { isUuid } = require('../../utils/security');
 const CustomError = require('../../utils/CustomError');
 

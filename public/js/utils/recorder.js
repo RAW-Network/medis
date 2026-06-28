@@ -1,5 +1,4 @@
-// utils/recorder.js - Browser-side DOM-to-Canvas UI testing & recording (Permission-free)
-
+/** UI recorder utilities for automated testing purposes */
 export async function runAutoUITest() {
   console.log("[AutoTest] Starting Permission-free UI Recording...");
 
