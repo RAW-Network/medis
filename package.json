@@ -1,6 +1,6 @@
 {
   "name": "medis",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Media Embedding Delivery for Interactive Sharing",
   "main": "src/index.js",
   "scripts": {

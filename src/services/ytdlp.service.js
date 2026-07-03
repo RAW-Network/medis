@@ -89,7 +89,7 @@ exports.executeDownload = (url, outputPath, cookiesPath, onProgress) => {
               etaSecs = parseInt(etaMatch[1]) * 60 + parseInt(etaMatch[2]);
             }
 
-            // Only broadcast non-NaN percentages to prevent UI glitches
+            // Broadcast valid progress values to prevent UI anomalies
             if (!isNaN(percent)) onProgress(percent, speedBytes, etaSecs);
           }
         }

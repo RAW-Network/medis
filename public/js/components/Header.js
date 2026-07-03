@@ -13,8 +13,7 @@ import { getState, subscribe } from '../state/store.js';
 /** @type {HTMLElement} */ let _progressPercentText;
 
 /* ── Constants ── */
-const HIDE_GRACE_MS = 1500;
-const HIDE_AFTER_MS = 800;
+const HIDE_DELAY_MS = 300;
 const THROTTLE_MS = 16;
 const REGRESS_THRESHOLD = 8;
 
@@ -30,25 +29,31 @@ const _p = {
 
 /* ── Private helpers ── */
 
-/** Show the progress bar container */
+/** Show the progress bar container with animation */
 function _showProgressUI() {
   if (!_progressContainer || _p.visible) return;
-  _progressContainer.style.display = 'block';
+  _progressContainer.style.removeProperty('display');
+  _progressContainer.classList.add('visible');
   _p.visible = true;
 }
 
-/** Hide the progress bar and reset internal state */
+/** Hide the progress bar with animation and reset internal state */
 function _hideProgressUI() {
   if (!_progressContainer) return;
-  _progressContainer.style.display = 'none';
-  _progressFill.style.width = '0%';
-  if (_progressBar) _progressBar.setAttribute('aria-valuenow', '0');
-  _progressText.textContent = '';
-  if (_progressPercentText) _progressPercentText.textContent = '';
+  _progressContainer.classList.remove('visible');
   _p.visible = false;
   _p.lastPercent = null;
   _p.lastBase = '';
   _p.lastRenderAt = 0;
+  // Reset bar dimensions after fade-out animation completes
+  setTimeout(() => {
+    if (!_p.visible) {
+      _progressFill.style.width = '0%';
+      if (_progressBar) _progressBar.setAttribute('aria-valuenow', '0');
+      _progressText.textContent = '';
+      if (_progressPercentText) _progressPercentText.textContent = '';
+    }
+  }, 400);
 }
 
 /** Schedule hiding the progress bar when idle */
@@ -58,15 +63,9 @@ function _scheduleHideIfIdle() {
   const downloading = getState('downloadingCount');
   if (downloading > 0) return;
 
-  const since = Date.now() - (_p.lastAt || 0);
-  if (since < HIDE_GRACE_MS) {
-    _p.hideTimer = setTimeout(_scheduleHideIfIdle, HIDE_GRACE_MS - since + 10);
-    return;
-  }
-
   _p.hideTimer = setTimeout(() => {
     if (getState('downloadingCount') === 0) _hideProgressUI();
-  }, HIDE_AFTER_MS);
+  }, HIDE_DELAY_MS);
 }
 
 /** Apply a progress render to the DOM (throttled) */
@@ -123,7 +122,7 @@ function _setProgress(percent, message, speed, eta) {
     _p.hideTimer = null;
   }
 
-  // Throttle DOM updates
+  // Limit DOM updates frequency
   if (now - _p.lastRenderAt < THROTTLE_MS) return;
   _p.lastRenderAt = now;
 
@@ -183,5 +182,9 @@ export function initHeader() {
 
   subscribe('progress:show', () => {
     if (getState('downloadingCount') > 0) _showProgressUI();
+  });
+
+  subscribe('progress:hide', () => {
+    _hideProgressUI();
   });
 }

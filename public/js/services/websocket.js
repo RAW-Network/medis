@@ -71,5 +71,6 @@ function _handleDownloadComplete(data) {
     setState('video:prepend', { newVideo: data.video });
   }
 
-  setState('progress:idle', {});
+  // Immediately dismiss progress bar on completion
+  setState('progress:hide', {});
 }
