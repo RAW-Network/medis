@@ -1,48 +1,24 @@
 /** WebSocket service for real-time bi-directional communication with the backend */
-import { setState } from '../state/store.js';
+import { getState, setState } from '../state/store.js';
 import { showToast } from '../components/Toast.js';
 
 let _socket = null;
 
-/** Reconnection config */
-const RECONNECT = {
-  baseMs: 1200,
-  maxMs: 30000,
-  attempt: 0
-};
-
-/** Calculate delay with exponential backoff */
-function _getReconnectDelay() {
-  const delay = Math.min(
-    RECONNECT.baseMs * Math.pow(2, RECONNECT.attempt),
-    RECONNECT.maxMs
-  );
-  RECONNECT.attempt++;
-  return delay;
-}
-
-/** Establish a WebSocket connection and set up message routing */
+/** Establish a WebSocket connection and set up message routing via Socket.IO */
 export function connect() {
-  const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-  _socket = new WebSocket(`${protocol}://${window.location.host}`);
+  // Initialize Socket.IO client
+  _socket = io();
 
-  _socket.onopen = () => {
-    RECONNECT.attempt = 0;
-
+  _socket.on('connect', () => {
     if (getState('downloadingCount') > 0) {
       setState('progress:show', {});
     }
-  };
+  });
 
-  _socket.onclose = () => {
-    const delay = _getReconnectDelay();
-    setTimeout(connect, delay);
-  };
-
-  _socket.onmessage = (event) => {
+  _socket.on('message', (messageStr) => {
     let data;
     try {
-      data = JSON.parse(event.data);
+      data = JSON.parse(messageStr);
     } catch (_e) {
       return;
     }
@@ -54,7 +30,9 @@ export function connect() {
       case 'progress':
         setState('progress:updated', {
           progressPercent: data.percent,
-          progressMessage: data.message
+          progressMessage: data.message,
+          speed: data.speed,
+          eta: data.eta
         });
         break;
       case 'downloadComplete':
@@ -70,7 +48,7 @@ export function connect() {
       default:
         break;
     }
-  };
+  });
 }
 
 /** Handle a 'status' WebSocket message */

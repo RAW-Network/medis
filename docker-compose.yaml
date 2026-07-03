@@ -10,7 +10,9 @@ services:
       - ./data:/data
       - ./cookies:/cookies
     environment:
-      - TZ=${TZ}
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ:-Asia/Makassar}
       - MAX_QUEUE_LIMIT=${MAX_QUEUE_LIMIT}
       - AUTO_UPDATE_YTDLP=${AUTO_UPDATE_YTDLP}
       - PLAYLIST_DOWNLOAD_LIMIT=${PLAYLIST_DOWNLOAD_LIMIT}

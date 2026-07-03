@@ -1,0 +1,10 @@
+{
+  "ignore": [
+    "data/*",
+    "cookies/*",
+    "*.db",
+    "*.db-journal",
+    "*.info.json",
+    "public/*"
+  ]
+}

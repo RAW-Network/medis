@@ -14,6 +14,16 @@ exports.ensureDirectoriesExist = () => {
 exports.init = async () => {
   try {
     exports.ensureDirectoriesExist();
+    
+    // Secure cookies folder
+    if (fs.existsSync(config.cookiesPath)) {
+      try {
+        fs.chmodSync(config.cookiesPath, 0o700);
+      } catch (e) {
+        console.warn('[Security] Could not restrict permissions on cookies folder');
+      }
+    }
+    
     await cleanupOnStartup();
 
     if (config.autoUpdateYtdlp) {

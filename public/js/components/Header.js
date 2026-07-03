@@ -1,6 +1,6 @@
 /** Header component for displaying statistics and active download progress */
 import { $ } from '../utils/dom.js';
-import { normalizeSpaces, stripAllPercents } from '../utils/format.js';
+import { normalizeSpaces, stripAllPercents, formatSpeed, formatEta } from '../utils/format.js';
 import { getState, subscribe } from '../state/store.js';
 
 /* ── DOM refs ── */
@@ -15,7 +15,7 @@ import { getState, subscribe } from '../state/store.js';
 /* ── Constants ── */
 const HIDE_GRACE_MS = 1500;
 const HIDE_AFTER_MS = 800;
-const THROTTLE_MS = 150;
+const THROTTLE_MS = 16;
 const REGRESS_THRESHOLD = 8;
 
 /* ── Internal State ── */
@@ -43,8 +43,8 @@ function _hideProgressUI() {
   _progressContainer.style.display = 'none';
   _progressFill.style.width = '0%';
   if (_progressBar) _progressBar.setAttribute('aria-valuenow', '0');
-  _progressText.textContent = 'Preparing...';
-  if (_progressPercentText) _progressPercentText.textContent = '0%';
+  _progressText.textContent = '';
+  if (_progressPercentText) _progressPercentText.textContent = '';
   _p.visible = false;
   _p.lastPercent = null;
   _p.lastBase = '';
@@ -70,7 +70,7 @@ function _scheduleHideIfIdle() {
 }
 
 /** Apply a progress render to the DOM (throttled) */
-function _setProgress(percent, message) {
+function _setProgress(percent, message, speed, eta) {
   if (!_progressContainer) return;
 
   const now = Date.now();
@@ -81,29 +81,35 @@ function _setProgress(percent, message) {
   const valid = !(percent === undefined || percent === null || Number.isNaN(n));
 
   if (!valid) {
-    _showProgressUI();
-    _progressFill.style.width = '0%';
-    if (_progressBar) _progressBar.setAttribute('aria-valuenow', '0');
-    _progressText.textContent = base;
-    if (_progressPercentText) _progressPercentText.textContent = '0%';
+    // Maintain terminal visual state and clear ETA when download completes
     _p.lastAt = now;
     _p.lastPercent = null;
     _p.lastBase = base;
+    
+    if (_progressContainer && _p.visible) {
+      _progressText.textContent = base;
+      if (_progressPercentText) _progressPercentText.textContent = '';
+    }
     return;
   }
 
   let p = Math.max(0, Math.min(100, Math.round(n)));
 
-  // Reset if progress regresses significantly (new video starting)
+  // Reset progress bar state when a new download sequence begins
   if (_p.lastPercent !== null && p + REGRESS_THRESHOLD < _p.lastPercent) {
-    _p.lastPercent = null;
-    _p.lastBase = '';
-    _showProgressUI();
-    _progressFill.style.width = '0%';
-    if (_progressBar) _progressBar.setAttribute('aria-valuenow', '0');
+    // Differentiate between a new download and a multi-part artifact stream
+    if (now - _p.lastAt > 2000 || _p.lastPercent < 98) {
+      _p.lastPercent = null;
+      _p.lastBase = '';
+      _showProgressUI();
+      _progressFill.style.width = '0%';
+      if (_progressBar) _progressBar.setAttribute('aria-valuenow', '0');
+    } else {
+      // Hold visual progress at 98% during final audio/video multiplexing
+      p = 98;
+    }
   }
 
-  // Don't allow minor regressions
   if (_p.lastPercent !== null && p < _p.lastPercent) {
     p = _p.lastPercent;
   }
@@ -124,7 +130,18 @@ function _setProgress(percent, message) {
   _showProgressUI();
   _progressFill.style.width = `${p}%`;
   if (_progressBar) _progressBar.setAttribute('aria-valuenow', String(p));
-  _progressText.textContent = base;
+  
+  let displayText = base;
+  if (speed) {
+    const speedStr = formatSpeed(speed);
+    const etaStr = formatEta(eta);
+    if (speedStr) {
+      displayText += ` — ${speedStr}`;
+      if (etaStr) displayText += ` (ETA: ${etaStr})`;
+    }
+  }
+  
+  _progressText.textContent = displayText;
   if (_progressPercentText) _progressPercentText.textContent = `${p}%`;
 }
 
@@ -157,7 +174,7 @@ export function initHeader() {
   });
 
   subscribe('progress:updated', (state) => {
-    _setProgress(state.progressPercent, state.progressMessage);
+    _setProgress(state.progressPercent, state.progressMessage, state.speed, state.eta);
   });
 
   subscribe('progress:idle', () => {

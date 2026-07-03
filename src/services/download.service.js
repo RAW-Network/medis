@@ -84,14 +84,43 @@ async function startDownload({ url, jobId }) {
   const cookiesFilePath = path.join(config.cookiesPath, 'cookies.txt');
 
   try {
-    websocketService.broadcast({ type: 'progress', stage: 'FETCHING_METADATA', message: 'Fetching Metadata', videoId });
+    const filename = `${videoId}.mp4`;
+    const outputPath = path.join(config.videosPath, filename);
+    const infoJsonPath = outputPath.replace('.mp4', '.info.json');
+    
+    // Initialize progress state before starting the download process
+    websocketService.broadcast({ type: 'progress', stage: 'STARTING', message: 'Starting Download...', percent: 0, videoId });
+    
+    await ytdlpService.executeDownload(url, outputPath, cookiesFilePath, (percent, speed, eta) => {
+      // Broadcast download metrics, capping visual progress at 98% during extraction
+      websocketService.broadcast({
+        type: 'progress',
+        stage: 'DOWNLOADING',
+        message: `Downloading ${Math.floor(percent)}%`,
+        percent: percent >= 100 ? 98 : percent,
+        speed,
+        eta,
+        videoId
+      });
+    });
 
-    const metadata = await ytdlpService.getMetadata(url, cookiesFilePath);
+    websocketService.broadcast({ type: 'progress', stage: 'PROCESSING', message: 'Merging video & audio...', percent: 99, videoId });
 
-    websocketService.broadcast({ type: 'progress', stage: 'FETCHING_THUMBNAIL', message: 'Fetching Thumbnail', videoId });
+    // Parse metadata exported by yt-dlp
+    let metadata = {};
+    try {
+      if (fs.existsSync(infoJsonPath)) {
+        metadata = JSON.parse(fs.readFileSync(infoJsonPath, 'utf8'));
+        // Clean up temporary metadata file
+        fs.unlinkSync(infoJsonPath);
+      }
+    } catch(err) {
+      console.error('Failed to parse info.json', err);
+    }
 
     let finalThumbnailUrl = '';
     if (metadata.thumbnail) {
+      websocketService.broadcast({ type: 'progress', stage: 'FETCHING_THUMBNAIL', message: 'Saving Thumbnail...', percent: 100, videoId });
       finalThumbnailUrl = await thumbnailService.download(metadata.thumbnail, videoId);
     }
 
@@ -99,26 +128,13 @@ async function startDownload({ url, jobId }) {
       id: videoId,
       title: metadata.title || 'Untitled Video',
       originalUrl: url,
-      filename: `${videoId}.mp4`,
+      filename,
       thumbnailUrl: finalThumbnailUrl,
       createdAt: new Date().toISOString(),
       width: metadata.width || 1280,
       height: metadata.height || 720
     };
 
-    const outputPath = path.join(config.videosPath, newVideoData.filename);
-    
-    await ytdlpService.executeDownload(url, outputPath, cookiesFilePath, (percent) => {
-      websocketService.broadcast({
-        type: 'progress',
-        stage: 'DOWNLOADING',
-        message: `Downloading Video ${Math.floor(percent)}%`,
-        percent,
-        videoId
-      });
-    });
-
-    websocketService.broadcast({ type: 'progress', stage: 'PROCESSING', message: 'Processing Video', percent: 100, videoId });
     videoService.createVideo(newVideoData);
     websocketService.broadcast({ type: 'downloadComplete', video: newVideoData });
 
@@ -137,7 +153,9 @@ function handleDownloadError(error, videoId) {
 
   if (errorMessage.includes('unsupported url')) userMessage = 'The provided URL is not supported';
   else if (errorMessage.includes('video unavailable')) userMessage = 'This video is unavailable or has been removed';
-  else if (errorMessage.includes('sign in') || errorMessage.includes('403: forbidden')) userMessage = 'Video private or restricted. Try using cookies!';
+  else if (errorMessage.includes('sign in') || errorMessage.includes('403: forbidden') || errorMessage.includes('empty media response')) userMessage = 'Video private or restricted. Please upload cookies.txt to /cookies!';
+  else if (errorMessage.includes('no space left')) userMessage = 'Server out of storage space!';
+  else if (errorMessage.includes('rate-limit')) userMessage = 'Rate limited by the platform. Try again later.';
   
   console.error(`[Download Error] ${videoId}:`, error.message);
 

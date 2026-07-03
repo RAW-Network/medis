@@ -1,30 +1,26 @@
 /** Service for broadcasting real-time updates to connected clients */
 const videoService = require('./video.service');
 
-let wssInstance = null;
+let ioInstance = null;
 let activeDownloads = 0;
 let downloadQueueSize = 0;
 
-exports.initializeWebSocket = (wss) => {
-  wssInstance = wss;
-  wss.on('connection', (ws) => {
-    ws.send(JSON.stringify({ type: 'status', activeDownloads, queueSize: downloadQueueSize }));
+exports.initializeWebSocket = (io) => {
+  ioInstance = io;
+  io.on('connection', (socket) => {
+    socket.emit('message', JSON.stringify({ type: 'status', activeDownloads, queueSize: downloadQueueSize }));
   });
 };
 
 exports.broadcast = (data) => {
-  if (!wssInstance) return;
-  wssInstance.clients.forEach(client => {
-    if (client.readyState === client.OPEN) {
-      client.send(JSON.stringify(data));
-    }
-  });
+  if (!ioInstance) return;
+  ioInstance.emit('message', JSON.stringify(data));
 };
 
 exports.updateStatus = (active, queue) => {
     activeDownloads = active;
     downloadQueueSize = queue;
-    this.broadcast({ type: 'status', activeDownloads: active, queueSize: queue });
+    exports.broadcast({ type: 'status', activeDownloads: active, queueSize: queue });
 };
 
 exports.cleanupOnStartup = async () => {
