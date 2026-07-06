@@ -50,10 +50,21 @@ if [ "$(stat -c %u "$COOKIES_DIR")" != "$PUID" ]; then
     chown $PUID:$PGID "$COOKIES_DIR"
 fi
 
-# Restrict permissions on cookie file for security
+# Restrict permissions on cookie folder and file for security
+chmod 700 "$COOKIES_DIR" 2>/dev/null || true
 if [ -f "$COOKIES_DIR/cookies.txt" ]; then
     chown $PUID:$PGID "$COOKIES_DIR/cookies.txt"
     chmod 600 "$COOKIES_DIR/cookies.txt"
+fi
+
+# Ensure yt-dlp binary is owned by the correct user so it can be updated
+if [ -f "${APP_DIR}/bin/yt-dlp" ]; then
+    chown $PUID:$PGID "${APP_DIR}/bin/yt-dlp"
+fi
+
+# Ensure bin directory is owned by the correct user
+if [ -d "${APP_DIR}/bin" ]; then
+    chown $PUID:$PGID "${APP_DIR}/bin"
 fi
 
 # Execute the application

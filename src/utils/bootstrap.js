@@ -20,7 +20,7 @@ exports.init = async () => {
       try {
         fs.chmodSync(config.cookiesPath, 0o700);
       } catch (e) {
-        console.warn('[Security] Could not restrict permissions on cookies folder');
+        // Silently ignore on Docker/Windows mounts where chmod is not supported
       }
     }
     
