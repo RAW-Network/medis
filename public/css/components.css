@@ -1,9 +1,7 @@
-/* CSS styles for specific UI components like badges and buttons */
 .header-stats-group {
   display: flex;
   gap: 12px;
 }
-
 .stats-badge-modern {
   background: rgba(15, 23, 42, 0.45);
   border: 1px solid var(--border-color);
@@ -18,13 +16,11 @@
   backdrop-filter: blur(8px);
   white-space: nowrap;
 }
-
 .stats-badge-modern:hover {
   border-color: var(--border-color-hover);
   background: var(--bg-card-hover);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
-
 .badge-icon-wrapper {
   width: 18px;
   height: 18px;
@@ -32,37 +28,26 @@
   align-items: center;
   justify-content: center;
 }
-
 .badge-icon-wrapper svg {
   width: 14px;
   height: 14px;
 }
-
 .badge-icon-wrapper.active {
   color: var(--color-primary-soft);
 }
-
-/* Icon pulse effect disabled for cleaner look */
 .icon-downloading.spin-active {
   opacity: 1;
 }
-
 .badge-icon-wrapper.completed {
   color: var(--color-success-soft);
 }
-
 .stats-value {
   font-weight: 700;
   color: var(--text-main);
 }
-
 .stats-label {
   color: var(--text-secondary);
 }
-
-/* ==========================================================================
-   HERO & SEARCH SECTION
-   ========================================================================== */
 .search-hero-section {
   display: flex;
   flex-direction: column;
@@ -72,7 +57,6 @@
   gap: 28px;
   width: 100%;
 }
-
 .gradient-title {
   font-family: var(--font-heading);
   font-weight: 800;
@@ -86,7 +70,6 @@
   line-height: 1;
   margin-bottom: 8px;
 }
-
 .hero-subtitle {
   font-family: var(--font-heading);
   font-size: 1.15rem;
@@ -97,7 +80,6 @@
   letter-spacing: -0.2px;
   line-height: 1.5;
 }
-
 .hero-features-row {
   display: flex;
   align-items: center;
@@ -105,7 +87,6 @@
   gap: 16px;
   margin: 20px 0 12px 0;
 }
-
 .feature-tag {
   display: flex;
   align-items: center;
@@ -115,24 +96,20 @@
   color: var(--text-muted);
   transition: var(--transition-smooth);
 }
-
 .feature-tag:hover {
   color: var(--color-primary-soft);
 }
-
 .feature-icon {
   width: 13px;
   height: 13px;
   stroke-width: 2.2;
 }
-
 .feature-tag-divider {
   width: 3px;
   height: 3px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.12);
 }
-
 .hero-badge {
   display: inline-block;
   background: rgba(255, 255, 255, 0.02);
@@ -143,14 +120,11 @@
   color: var(--text-muted);
   font-weight: 500;
 }
-
-/* Search Input Bar */
 .search-form-wrapper {
   width: 100%;
   max-width: 700px;
   margin-top: 12px;
 }
-
 .search-input-group {
   position: relative;
   display: flex;
@@ -163,12 +137,10 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
 }
-
 .search-input-group:focus-within {
   border-color: var(--border-color-focus);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
-
 .input-icon-left {
   position: absolute;
   left: 20px;
@@ -178,12 +150,10 @@
   align-items: center;
   color: var(--text-muted);
 }
-
 .input-icon-left svg {
   width: 20px;
   height: 20px;
 }
-
 .modern-url-input {
   width: 100%;
   height: 52px;
@@ -192,20 +162,18 @@
   font-size: 1rem;
   font-weight: 400;
 }
-
 .modern-url-input::placeholder {
   color: var(--text-muted);
 }
-
-/* Modern Download Button */
 .modern-download-button {
   height: 52px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  background: #0284c7;
   color: #ffffff;
   font-weight: 600;
   font-size: 0.95rem;
   border-radius: 30px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
   transition: all 0.2s ease-out;
   display: flex;
   align-items: center;
@@ -214,16 +182,16 @@
   padding: 0 32px;
   position: relative;
 }
-
 .modern-download-button:hover {
+  background: #0369a1;
+  border-color: rgba(255, 255, 255, 0.2);
   transform: none;
-  box-shadow: 0 4px 20px rgba(56, 189, 248, 0.25);
-  filter: brightness(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  filter: none;
 }
-
 .modern-download-button:active {
-  transform: scale(0.97);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  transform: scale(0.98);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 .modern-download-button:disabled {
   background: var(--bg-card);
@@ -233,10 +201,6 @@
   cursor: not-allowed;
   transform: none;
 }
-
-/* ==========================================================================
-   VIDEO LIBRARY CARDS
-   ========================================================================== */
 .video-card {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.04);
@@ -246,15 +210,16 @@
   flex-direction: column;
   transition: var(--transition-smooth);
   position: relative;
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 300px;
+  contain: layout style paint;
 }
-
 .video-card:hover {
   background: rgba(255, 255, 255, 0.04);
   border-color: rgba(255, 255, 255, 0.1);
   transform: none;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }
-
 .card-thumb-wrapper {
   width: 100%;
   aspect-ratio: 16/9;
@@ -263,7 +228,6 @@
   background: var(--bg-surface);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
-
 .card-video-placeholder {
   width: 100%;
   height: 100%;
@@ -275,18 +239,14 @@
   align-items: center;
   justify-content: center;
 }
-
 .no-thumbnail {
   background: rgba(255, 255, 255, 0.02);
 }
-
 .card-video-player {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-
-/* Play Icon Overlay (Glassmorphism) */
 .play-icon-wrapper {
   width: 44px;
   height: 44px;
@@ -303,24 +263,19 @@
   opacity: 0;
   transition: var(--transition-smooth);
 }
-
 .video-card:hover .play-icon-wrapper {
   opacity: 1;
 }
-
 .play-icon-wrapper:hover {
   background: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.3);
   box-shadow: 0 4px 16px rgba(255, 255, 255, 0.1);
 }
-
 .play-icon-wrapper svg {
   width: 16px;
   height: 16px;
   margin-left: 2px;
 }
-
-/* Badges Overlay (Resolution tags) */
 .card-badges-overlay {
   position: absolute;
   top: 10px;
@@ -329,7 +284,6 @@
   gap: 6px;
   pointer-events: none;
 }
-
 .badge-pill {
   padding: 3px 8px;
   font-size: 0.7rem;
@@ -338,14 +292,11 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
-
 .badge-res {
   background: rgba(15, 23, 42, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--color-primary-soft);
 }
-
-/* Card Actions (Share & Delete) */
 .card-actions-row {
   display: flex;
   gap: 8px;
@@ -353,7 +304,6 @@
   padding-top: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.03);
 }
-
 .btn-action-clean {
   flex: 1;
   justify-content: center;
@@ -370,43 +320,34 @@
   cursor: pointer;
   transition: var(--transition-smooth);
 }
-
 .btn-action-clean:hover {
   background: rgba(255, 255, 255, 0.06);
   color: var(--text-main);
 }
-
 .btn-action-clean svg {
   width: 14px;
   height: 14px;
   stroke-width: 2.2;
 }
-
 .btn-copy-clean:hover {
   color: var(--color-primary-soft);
   border-color: rgba(56, 189, 248, 0.2);
   background: rgba(56, 189, 248, 0.05);
 }
-
 .btn-copy-clean.copied {
   color: var(--color-success-soft) !important;
 }
-
 .btn-delete-clean:hover {
   color: var(--color-error-soft);
   border-color: rgba(244, 63, 94, 0.2);
   background: rgba(244, 63, 94, 0.05);
 }
-
-
-/* Card Metadata */
 .card-info-modern {
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-
 .card-title-modern {
   font-family: var(--font-heading);
   font-size: 0.95rem;
@@ -422,7 +363,6 @@
   min-height: 2.8em;
   transition: var(--transition-smooth);
 }
-
 .card-meta-row {
   display: flex;
   align-items: center;
@@ -431,10 +371,6 @@
   color: var(--text-muted);
   font-weight: 400;
 }
-
-/* ==========================================================================
-   EMPTY & ERROR STATES
-   ========================================================================== */
 .library-empty {
   grid-column: 1 / -1;
   text-align: center;
@@ -445,7 +381,6 @@
   background: rgba(255, 255, 255, 0.01);
   font-size: 0.95rem;
 }
-
 .library-error {
   grid-column: 1 / -1;
   text-align: center;
@@ -456,10 +391,6 @@
   background: var(--color-error-glow);
   font-size: 0.95rem;
 }
-
-/* ==========================================================================
-   SPINNERS & LOADERS
-   ========================================================================== */
 .spinner-inline {
   width: 14px;
   height: 14px;
@@ -468,7 +399,6 @@
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
-
 .spinner-inline-blue {
   width: 14px;
   height: 14px;
@@ -477,14 +407,9 @@
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
-
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
-
-/* ==========================================================================
-   MODALS (CONFIRMATION & VIDEO PLAYER)
-   ========================================================================== */
 .modal-overlay-modern {
   position: fixed;
   inset: 0;
@@ -500,17 +425,14 @@
   transition: opacity 0.15s ease-out;
   pointer-events: none;
 }
-
 .modal-overlay-modern.hidden {
   display: none;
   pointer-events: none;
 }
-
 .modal-overlay-modern.visible {
   opacity: 1;
   pointer-events: auto;
 }
-
 .modal-card-modern {
   background: #0b1329;
   border: 1px solid var(--border-color-hover);
@@ -525,23 +447,19 @@
   transform: scale(0.95);
   transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
-
 .modal-overlay-modern.visible .modal-card-modern {
   transform: scale(1);
 }
-
 .modal-header-modern {
   display: flex;
   align-items: center;
 }
-
 .modal-title-modern {
   font-family: var(--font-heading);
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-main);
 }
-
 .modal-icon-wrapper {
   width: 54px;
   height: 54px;
@@ -553,12 +471,10 @@
   justify-content: center;
   margin: 0 auto 12px auto;
 }
-
 .modal-icon-wrapper svg {
   width: 24px;
   height: 24px;
 }
-
 .custom-modal-title {
   text-align: center;
   font-family: var(--font-heading);
@@ -566,14 +482,12 @@
   font-weight: 700;
   margin-bottom: 8px;
 }
-
 .modal-message-modern, .modal-message {
   text-align: center;
   font-size: 0.9rem;
   color: var(--text-secondary);
   line-height: 1.5;
 }
-
 .video-highlight {
   display: block;
   margin-top: 10px;
@@ -585,13 +499,11 @@
   border: 1px solid var(--border-color);
   word-break: break-all;
 }
-
 .modal-actions-modern {
   display: flex;
   gap: 12px;
   margin-top: 8px;
 }
-
 .modal-btn-modern {
   flex-grow: 1;
   height: 42px;
@@ -603,31 +515,23 @@
   justify-content: center;
   transition: var(--transition-smooth);
 }
-
 .modal-btn-modern.secondary {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
 }
-
 .modal-btn-modern.secondary:hover {
   background: rgba(255, 255, 255, 0.08);
   color: var(--text-main);
 }
-
 .modal-btn-modern.danger {
   background: var(--color-error);
   color: #fff;
 }
-
 .modal-btn-modern.danger:hover {
   background: #e11d48;
   box-shadow: 0 0 15px rgba(244, 63, 94, 0.3);
 }
-
-/* ==========================================================================
-   FOOTER COMPONENTS
-   ========================================================================== */
 .github-link-modern {
   display: flex;
   align-items: center;
@@ -640,23 +544,18 @@
   border-radius: 30px;
   font-weight: 500;
 }
-
 .github-link-text {
   display: inline;
 }
-
 .github-link-modern:hover {
   color: var(--text-main);
   border-color: var(--border-color-hover);
   background: rgba(255, 255, 255, 0.05);
 }
-
 .git-icon-svg {
   width: 14px;
   height: 14px;
 }
-
-/* Fullscreen Video Player */
 .video-modal-card-modern {
   position: relative;
   width: 90vw;
@@ -669,17 +568,14 @@
   transform: scale(0.95);
   transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
-
 .modal-overlay-modern.visible .video-modal-card-modern {
   transform: scale(1);
 }
-
 .video-modal-player {
   width: 100%;
   height: 100%;
   background: #000;
 }
-
 .video-modal-close-btn {
   position: absolute;
   top: 16px;
@@ -696,20 +592,14 @@
   z-index: 10;
   transition: var(--transition-smooth);
 }
-
 .video-modal-close-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.2);
 }
-
 .video-modal-close-btn svg {
   width: 18px;
   height: 18px;
 }
-
-/* ==========================================================================
-   MEDIA QUERIES (RESPONSIVE)
-   ========================================================================== */
 @media (max-width: 768px) {
   .gradient-title {
     font-size: 3rem;
@@ -737,7 +627,6 @@
     top: 36px;
   }
 }
-
 @media (max-width: 640px) {
   .gradient-title {
     font-size: 2.4rem;
@@ -756,7 +645,6 @@
     border-radius: 0;
   }
 }
-
 @media (max-width: 380px) {
   .github-link-text {
     display: none;

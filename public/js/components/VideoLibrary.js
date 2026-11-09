@@ -1,56 +1,102 @@
-/** Video library component for fetching and rendering the list of videos */
 import { $ } from '../utils/dom.js';
 import { fetchVideos } from '../api/client.js';
 import { setState, getState, subscribe } from '../state/store.js';
 import { createVideoCard } from './VideoCard.js';
 
-/** @type {HTMLElement} */ let _grid;
+let _grid;
+let _allVideos = [];
+let _displayedCount = 0;
+const PAGE_SIZE = 24;
+let _scrollObserver = null;
+let _sentinel = null;
 
-/** HTML for the empty library state */
 const EMPTY_HTML = '<p class="library-empty">Your library is empty. Start by downloading a video.</p>';
-
-/** HTML for the error state */
 const ERROR_HTML = '<p class="library-error">Failed to load video library.</p>';
 
-/** Render the video list into the grid container */
+function _appendNextBatch() {
+  if (_displayedCount >= _allVideos.length) return;
+
+  const nextBatch = _allVideos.slice(_displayedCount, _displayedCount + PAGE_SIZE);
+  const fragment = document.createDocumentFragment();
+  nextBatch.forEach((video) => {
+    fragment.appendChild(createVideoCard(video));
+  });
+
+  if (_sentinel && _sentinel.parentNode === _grid) {
+    _grid.insertBefore(fragment, _sentinel);
+  } else {
+    _grid.appendChild(fragment);
+  }
+
+  _displayedCount += nextBatch.length;
+
+  if (_displayedCount >= _allVideos.length && _sentinel) {
+    _sentinel.style.display = 'none';
+  } else if (_sentinel) {
+    _sentinel.style.display = 'block';
+  }
+}
+
+function _setupSentinel() {
+  if (!_sentinel) {
+    _sentinel = document.createElement('div');
+    _sentinel.id = 'library-scroll-sentinel';
+    _sentinel.style.height = '20px';
+    _sentinel.style.gridColumn = '1 / -1';
+  }
+
+  _grid.appendChild(_sentinel);
+
+  if (_scrollObserver) {
+    _scrollObserver.disconnect();
+  }
+
+  _scrollObserver = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      _appendNextBatch();
+    }
+  }, { rootMargin: '300px' });
+
+  _scrollObserver.observe(_sentinel);
+}
+
 function _renderVideos(videos) {
+  _allVideos = videos || [];
+  _displayedCount = 0;
   _grid.innerHTML = '';
 
-  if (!videos || videos.length === 0) {
+  if (_allVideos.length === 0) {
     _grid.innerHTML = EMPTY_HTML;
     return;
   }
 
-  const fragment = document.createDocumentFragment();
-  videos.forEach((video) => {
-    fragment.appendChild(createVideoCard(video));
-  });
-  _grid.appendChild(fragment);
+  _setupSentinel();
+  _appendNextBatch();
 }
 
-/** Prepend a single new video card to the grid (no re-fetch needed) */
 function _prependVideo(state) {
   const video = state.newVideo;
   if (!video || !video.id) return;
 
-  // Don't add duplicate
   if (document.getElementById(`video-card-${video.id}`)) return;
 
-  // Remove empty state message if present
   const emptyMsg = _grid.querySelector('.library-empty');
   if (emptyMsg) emptyMsg.remove();
+
+  _allVideos.unshift(video);
+  _displayedCount++;
 
   const card = createVideoCard(video);
   _grid.insertBefore(card, _grid.firstChild);
 
-  const newCount = _grid.querySelectorAll('.video-card').length;
-  setState('videos:updated', { completedCount: newCount });
+  setState('videos:updated', { completedCount: _allVideos.length });
 }
 
-/** Handle a VIDEO_DELETED event by removing the card */
 function _handleVideoDeleted(state) {
   const videoId = state.deletedVideoId;
   if (!videoId) return;
+
+  _allVideos = _allVideos.filter((v) => v.id !== videoId);
 
   const card = document.getElementById(`video-card-${videoId}`);
   if (card) {
@@ -60,18 +106,17 @@ function _handleVideoDeleted(state) {
 
     setTimeout(() => {
       card.remove();
-      const currentCount = getState('completedCount');
-      const newCount = Math.max(0, currentCount - 1);
+      _displayedCount = Math.max(0, _displayedCount - 1);
+      const newCount = _allVideos.length;
       setState('videos:updated', { completedCount: newCount });
 
-      if (_grid.querySelectorAll('.video-card').length === 0) {
+      if (_allVideos.length === 0) {
         _grid.innerHTML = EMPTY_HTML;
       }
     }, 250);
   }
 }
 
-/** Fetch videos from the API and update the store + DOM */
 export async function refreshVideos() {
   try {
     const videos = await fetchVideos();
@@ -85,16 +130,11 @@ export async function refreshVideos() {
   }
 }
 
-/** Initialise library DOM references and initial fetch */
 export function initVideoLibrary() {
   _grid = $('video-list');
 
-  // When a new video is downloaded, prepend it directly (no re-fetch)
   subscribe('video:prepend', _prependVideo);
-
-  // When a video is deleted via WebSocket broadcast
   subscribe('video:deleted', _handleVideoDeleted);
 
-  // Initial load — only time we fetch the full list
   refreshVideos();
 }

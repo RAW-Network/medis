@@ -1,4 +1,3 @@
-/** Component for creating video card elements to be displayed in the gallery */
 import { el } from '../utils/dom.js';
 import { ICONS } from '../utils/icons.js';
 import { copyToClipboard } from '../utils/clipboard.js';
@@ -6,9 +5,22 @@ import { showToast } from './Toast.js';
 import { showConfirmModal } from './Modal.js';
 import { deleteVideo } from '../api/client.js';
 
-/** Open a video in a modal player */
+const thumbObserver = new IntersectionObserver((entries, observer) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      const target = entry.target;
+      const thumbUrl = target.dataset.thumb;
+      if (thumbUrl) {
+        target.style.backgroundImage = `url('${thumbUrl}')`;
+        delete target.dataset.thumb;
+      }
+      observer.unobserve(target);
+    }
+  });
+}, { rootMargin: '200px 0px' });
+
 function _playVideo(event) {
-  const placeholder = /** @type {HTMLElement} */ (event.currentTarget);
+  const placeholder = event.currentTarget;
   const videoSrc = placeholder.dataset.src;
   if (!videoSrc) return;
 
@@ -23,8 +35,7 @@ function _playVideo(event) {
   videoPlayer.src = videoSrc;
   modal.classList.remove('hidden');
   requestAnimationFrame(() => modal.classList.add('visible'));
-  
-  // Prevent scrolling behind modal on mobile
+
   document.body.style.overflow = 'hidden';
 
   const closeModal = () => {
@@ -53,7 +64,6 @@ function _playVideo(event) {
   document.addEventListener('keydown', onEsc);
 }
 
-/** Get resolution label from width and height */
 function _getResolutionLabel(width, height) {
   if (!width || !height) return '';
   const minSide = Math.min(width, height);
@@ -64,7 +74,6 @@ function _getResolutionLabel(width, height) {
   return 'SD';
 }
 
-/** Create a video card DOM element */
 export function createVideoCard(video) {
   const card = el('div', {
     className: 'video-card group',
@@ -72,7 +81,6 @@ export function createVideoCard(video) {
     dataset: { videoId: video.id }
   });
 
-  // ── Thumbnail wrapper ──
   const thumbWrapper = el('div', { className: 'card-thumb-wrapper' });
 
   const placeholder = el('div', {
@@ -81,20 +89,19 @@ export function createVideoCard(video) {
   });
 
   if (video.thumbnailUrl && video.thumbnailUrl.trim() !== '') {
-    placeholder.style.backgroundImage = `url('${video.thumbnailUrl}')`;
+    placeholder.dataset.thumb = video.thumbnailUrl;
+    thumbObserver.observe(placeholder);
   } else {
     placeholder.classList.add('no-thumbnail');
   }
 
-  // Modern minimal play icon (only visible on hover)
-  const playIcon = el('div', { 
+  const playIcon = el('div', {
     className: 'play-icon-wrapper',
     html: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>'
   });
   placeholder.appendChild(playIcon);
   placeholder.addEventListener('click', _playVideo);
 
-  // Tags & Badges overlay (top right)
   const badgesContainer = el('div', { className: 'card-badges-overlay' });
   const resLabel = _getResolutionLabel(video.width, video.height);
   if (resLabel) {
@@ -104,18 +111,17 @@ export function createVideoCard(video) {
 
   thumbWrapper.append(placeholder, badgesContainer);
 
-  // ── Info section (Ultra-clean typography) ──
   const info = el('div', { className: 'card-info-modern' });
 
   const title = el('h3', { className: 'card-title-modern', text: video.title || 'Untitled Video' });
-  
+
   const metaRow = el('div', { className: 'card-meta-row' });
   const date = el('span', { className: 'card-meta-item' });
   const dt = video.createdAt ? new Date(video.createdAt) : null;
-  date.textContent = dt && !isNaN(dt.getTime()) 
-    ? dt.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) 
+  date.textContent = dt && !isNaN(dt.getTime())
+    ? dt.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
     : '';
-    
+
   metaRow.append(date);
 
   const actionsRow = el('div', { className: 'card-actions-row' });
@@ -124,19 +130,18 @@ export function createVideoCard(video) {
   actionsRow.append(copyBtn, deleteBtn);
 
   info.append(title, metaRow, actionsRow);
-  
+
   card.append(thumbWrapper, info);
 
   return card;
 }
 
-/** Create the minimal "Copy" share-link button */
 function _createCopyButton(video) {
-  const btn = /** @type {HTMLButtonElement} */ (el('button', {
+  const btn = el('button', {
     className: 'btn-action-clean btn-copy-clean',
     html: ICONS.copy + ' <span>Share</span>',
     attrs: { title: 'Copy Share Link', type: 'button' }
-  }));
+  });
 
   btn.addEventListener('click', async (e) => {
     e.stopPropagation();
@@ -162,13 +167,12 @@ function _createCopyButton(video) {
   return btn;
 }
 
-/** Create the minimal "Delete" button */
 function _createDeleteButton(video, card) {
-  const btn = /** @type {HTMLButtonElement} */ (el('button', {
+  const btn = el('button', {
     className: 'btn-action-clean btn-delete-clean',
     html: ICONS.trash + ' <span>Delete</span>',
     attrs: { title: 'Delete Video', type: 'button' }
-  }));
+  });
 
   btn.addEventListener('click', async (e) => {
     e.stopPropagation();
